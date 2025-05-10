@@ -45,7 +45,8 @@ input {width:85%; height:40px; font-size:100%; border-radius:30px;}
   
     </div>
     <div style="display: flex;">
-<input type="serch" id="query" placeholder="검색어를 입력하세요">
+<input list="suggestions" type="search" id="query" placeholder="검색어를 입력하세요">
+<datalist id="suggestions"></datalist>
    <a href="https://search.app.goo.gl/?ofl=https%3A%2F%2Flens.google&al=googleapp%3A%2F%2Flens%3Flens_data%3DKAw&apn=com.google.android.googlequicksearchbox&amv=301204913&isi=284815942&ius=googleapp&ibi=com.google.GoogleMobile&link=https%3A%2F%2Fgoo.gl%2Fiosgoogleapp%2Fdefault%3Furl%3Dgoogleapp%253A%252F%252Flens%253Fmin-version%253D180%2526lens_data%253DKAw&ifl=https%3A%2F%2Fapps.apple.com%2Fus%2Fapp%2Fgoogle%2Fid284815942%3Fppid%3D1ac8cc35-d99c-4a1d-b909-321c8968cc74%26pt%3D9008%26mt%3D8%26ct%3D4815459-oo-lens-isb-bar-lens-cam%26UTM_campaign%3Dgoogle_search_mweb&efr=1&ct=4815459-oo-lens-isb-bar-lens-cam&utm_campaign=4815459-oo-lens-isb-bar-lens-cam&utm_source=google_search_mweb&utm_medium=owned&pt=9008&mt=8"><img src="https://lh3.googleusercontent.com/H65Hxq0ooUCcwhoRGU-fwoXqrGS58mwa2vtr2ZfhGgJzMU0uYybOrZVBs8jydtR22TRC1k9XwDMD2xHB5BBU4IyXW7oH8PyCsq46uX6A42CmXP5GDZ2d"></a>
     </div>
         <button onclick="search('google')">구글 검색</button>
@@ -58,38 +59,50 @@ input {width:85%; height:40px; font-size:100%; border-radius:30px;}
 <button onclick="search('youtube')">유튜브 검색</button>
 
 <script>
-function search(engine) {
-  const query = document.getElementById('query').value;
-  let url = '';
+function updateSuggestions() {
+    const datalist = document.getElementById("suggestions");
+    datalist.innerHTML = ''; // 초기화
+    const history = JSON.parse(localStorage.getItem("searchHistory") || "[]");
+    history.forEach(item => {
+      const option = document.createElement("option");
+      option.value = item;
+      datalist.appendChild(option);
+    });
+  }
 
-  switch(engine) {case 'google':
-      url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-      break;
-    case 'naver':
-      url = `https://search.naver.com/search.naver?query=${encodeURIComponent(query)}`;
-      break;
-    case 'daum':
-      url = `https://search.daum.net/search?q=${encodeURIComponent(query)}`;
-      break;
-    case 'yahoo':
-      url = `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`;
-      break;
-    case 'bing':
-      url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
-      break;
-    case 'nate':
-      url = `https://search.daum.net/nate?q=${encodeURIComponent(query)}`;
-      break;
-    case 'zum':
-      url = `https://search.zum.com/search.zum?query=${encodeURIComponent(query)}`;
-      break;
-    case 'youtube':
-      url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-      break;
-          }
+  // 검색 함수
+  function search(engine) {
+    const input = document.getElementById('query');
+    const query = input.value.trim();
+    if (!query) return;
 
-  window.open(url, '_blank');
-}
+    // 검색어 저장
+    let history = JSON.parse(localStorage.getItem("searchHistory") || "[]");
+    if (!history.includes(query)) {
+      history.unshift(query); // 최근 검색어를 앞에 추가
+      if (history.length > 10) history.pop(); // 최대 10개만 저장
+      localStorage.setItem("searchHistory", JSON.stringify(history));
+    }
+
+    updateSuggestions(); // 새 검색어 반영
+
+    // 검색 엔진 처리
+    let url = '';
+    switch(engine) {
+      case 'google': url = `https://www.google.com/search?q=${encodeURIComponent(query)}`; break;
+      case 'naver': url = `https://search.naver.com/search.naver?query=${encodeURIComponent(query)}`; break;
+      case 'daum': url = `https://search.daum.net/search?q=${encodeURIComponent(query)}`; break;
+      case 'yahoo': url = `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`; break;
+      case 'bing': url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`; break;
+      case 'nate': url = `https://search.daum.net/nate?q=${encodeURIComponent(query)}`; break;
+      case 'zum': url = `https://search.zum.com/search.zum?query=${encodeURIComponent(query)}`; break;
+      case 'youtube': url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`; break;
+    }
+    window.open(url, '_blank');
+  }
+
+  // 페이지 로드 시 자동완성 초기화
+  window.onload = updateSuggestions;
 </script>
 </body>
 </html>
