@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,6 +28,16 @@
 <meta property="og:image" content="https://bamtolcompany.github.io/favicon.ico">
 <meta property="og:url" content="https://bamtolcompany.github.io/">
 <style>
+  #autocomplete-list li {
+    padding: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  #autocomplete-list li:hover {
+    background-color: #f0f0f0;
+  }
 body {background-color:#1AC8FF;}
 h1 {color:white;}
 h4 {color:white;}
@@ -34,7 +45,7 @@ h6 {color:white;}
 a {font-size:40px; color:black; text-decoration:none;}
     img {width:40px; height:40px;}
 button {background-color:yellow; width:300px; height:75px; border-radius:30px; margin:3px; font-size:40px;}
-input {width:85%; height:40px; font-size:100%; border-radius:30px;}
+input {width:100%; height:40px; font-size:100%; border-radius:30px;}
 </style>
 </head>
 <body>
@@ -44,9 +55,12 @@ input {width:85%; height:40px; font-size:100%; border-radius:30px;}
       <button style="width:130px; height:45px; background-color:gray; border-radius:5px;"><a href="https://bamtolcompany.github.io/allinoneshopping/" style="font-size:20px;">올인원 쇼핑</a></button>
   
     </div>
-    <div style="display: flex;">
-<input list="suggestions" type="search" id="query" placeholder="검색어를 입력하세요">
-<datalist id="suggestions"></datalist>
+    <div style="display: flex; gap:5px;">
+<!-- input 태그 수정 -->
+<div style="position: relative; display: inline-block; width: 85%;">
+  <input type="search" id="query" placeholder="검색어를 입력하세요" oninput="showSuggestions()">
+  <ul id="autocomplete-list" style="position: absolute; z-index: 1000; background: white; border-radius: 10px; list-style: none; margin: 0; padding: 0; width: 100%; display: none; max-height: 200px; overflow-y: auto;"></ul>
+</div>
    <a href="https://search.app.goo.gl/?ofl=https%3A%2F%2Flens.google&al=googleapp%3A%2F%2Flens%3Flens_data%3DKAw&apn=com.google.android.googlequicksearchbox&amv=301204913&isi=284815942&ius=googleapp&ibi=com.google.GoogleMobile&link=https%3A%2F%2Fgoo.gl%2Fiosgoogleapp%2Fdefault%3Furl%3Dgoogleapp%253A%252F%252Flens%253Fmin-version%253D180%2526lens_data%253DKAw&ifl=https%3A%2F%2Fapps.apple.com%2Fus%2Fapp%2Fgoogle%2Fid284815942%3Fppid%3D1ac8cc35-d99c-4a1d-b909-321c8968cc74%26pt%3D9008%26mt%3D8%26ct%3D4815459-oo-lens-isb-bar-lens-cam%26UTM_campaign%3Dgoogle_search_mweb&efr=1&ct=4815459-oo-lens-isb-bar-lens-cam&utm_campaign=4815459-oo-lens-isb-bar-lens-cam&utm_source=google_search_mweb&utm_medium=owned&pt=9008&mt=8"><img src="https://lh3.googleusercontent.com/H65Hxq0ooUCcwhoRGU-fwoXqrGS58mwa2vtr2ZfhGgJzMU0uYybOrZVBs8jydtR22TRC1k9XwDMD2xHB5BBU4IyXW7oH8PyCsq46uX6A42CmXP5GDZ2d"></a>
     </div>
         <button onclick="search('google')">구글 검색</button>
@@ -59,32 +73,46 @@ input {width:85%; height:40px; font-size:100%; border-radius:30px;}
 <button onclick="search('youtube')">유튜브 검색</button>
 
 <script>
-function updateSuggestions() {
-    const datalist = document.getElementById("suggestions");
-    datalist.innerHTML = ''; // 초기화
-    const history = JSON.parse(localStorage.getItem("searchHistory") || "[]");
-    history.forEach(item => {
-      const option = document.createElement("option");
-      option.value = item;
-      datalist.appendChild(option);
-    });
+  function getSearchHistory() {
+    return JSON.parse(localStorage.getItem("searchHistory") || "[]");
   }
 
-  // 검색 함수
+  function showSuggestions() {
+    const input = document.getElementById("query");
+    const list = document.getElementById("autocomplete-list");
+    const query = input.value.toLowerCase();
+    const history = getSearchHistory().filter(item => item.toLowerCase().includes(query));
+    
+    list.innerHTML = '';
+    if (query && history.length > 0) {
+      list.style.display = 'block';
+      history.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        li.onclick = () => {
+          input.value = item;
+          list.style.display = 'none';
+        };
+        list.appendChild(li);
+      });
+    } else {
+      list.style.display = 'none';
+    }
+  }
+
+  // 검색어 저장 로직은 기존과 동일하게 유지
   function search(engine) {
     const input = document.getElementById('query');
     const query = input.value.trim();
     if (!query) return;
 
-    // 검색어 저장
-    let history = JSON.parse(localStorage.getItem("searchHistory") || "[]");
+    // 저장
+    let history = getSearchHistory();
     if (!history.includes(query)) {
-      history.unshift(query); // 최근 검색어를 앞에 추가
-      if (history.length > 10) history.pop(); // 최대 10개만 저장
+      history.unshift(query);
+      if (history.length > 10) history.pop();
       localStorage.setItem("searchHistory", JSON.stringify(history));
     }
-
-    updateSuggestions(); // 새 검색어 반영
 
     // 검색 엔진 처리
     let url = '';
@@ -99,10 +127,15 @@ function updateSuggestions() {
       case 'youtube': url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`; break;
     }
     window.open(url, '_blank');
+    document.getElementById('autocomplete-list').style.display = 'none';
   }
 
-  // 페이지 로드 시 자동완성 초기화
-  window.onload = updateSuggestions;
+  // 클릭 외부 감지해서 리스트 숨기기
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#query') && !e.target.closest('#autocomplete-list')) {
+      document.getElementById('autocomplete-list').style.display = 'none';
+    }
+  });
 </script>
 </body>
 </html>
