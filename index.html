@@ -58,7 +58,7 @@ input {width:100%; height:40px; font-size:100%; border-radius:30px;}
     <div style="text-align:center;">
     <button style="width:130px; height:45px; background-color:gray; border-radius:5px;"><a href="https://bamtolcompany.github.io/allinonenews/" style="font-size:20px;">올인원 뉴스</a></button>
       <button style="width:130px; height:45px; background-color:gray; border-radius:5px;"><a href="https://bamtolcompany.github.io/allinoneshopping/" style="font-size:20px;">올인원 쇼핑</a></button>
-  
+
     </div>
     <div style="display: flex; gap:5px;">
 <!-- input 태그 수정 -->
@@ -81,6 +81,7 @@ input {width:100%; height:40px; font-size:100%; border-radius:30px;}
      crossorigin="anonymous"></script>
 <!-- 배너광고 -->
 <ins class="adsbygoogle"
+     style="display:inline-block;width:950px;height:90px"
      style="display:inline-block;width:728px;height:90px"
      data-ad-client="ca-pub-9258543756875713"
      data-ad-slot="8350000366"></ins>
@@ -88,99 +89,94 @@ input {width:100%; height:40px; font-size:100%; border-radius:30px;}
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 <script>
-function showSuggestions() {
-  const input = document.getElementById("query");
-  const list = document.getElementById("autocomplete-list");
-  const query = input.value.trim();
-
-  if (!query) {
-    list.innerHTML = "";
-    list.style.display = "none";
-    return;
+  function getSearchHistory() {
+    return JSON.parse(localStorage.getItem("searchHistory") || "[]");
   }
 
-  const apiUrl = `https://ac.search.naver.com/nx/ac?q=${encodeURIComponent(query)}&con=1&frm=nx&ans=2&r_format=json&r_enc=UTF-8&r_unicode=0&t_koreng=1&run=2&rev=4&q_enc=UTF-8&st=100`;
+  function showSuggestions() {
+    const input = document.getElementById("query");
+    const list = document.getElementById("autocomplete-list");
+    const query = input.value.toLowerCase();
+    const history = getSearchHistory().filter(item => item.toLowerCase().includes(query));
 
-  fetch(apiUrl)
-    .then(res => res.json())
-    .then(data => {
-      const items = data.items?.[0] || [];
-      list.innerHTML = "";
-      if (items.length > 0) {
-        items.slice(0, 10).forEach(item => {
-          const li = document.createElement("li");
-          li.textContent = item[0];
-          li.onclick = () => {
-            input.value = item[0];
-            list.style.display = "none";
-          };
-          list.appendChild(li);
-        });
-        list.style.display = "block";
-      } else {
-        list.style.display = "none";
-      }
-    })
-    .catch(err => {
-      console.error("네이버 자동완성 오류:", err);
-      list.style.display = "none";
-    });
-}
-
-function search(engine) {
-  const query = document.getElementById("query").value.trim();
-  if (!query) return;
-
-  let url = '';
-  switch(engine) {
-    case 'google': url = `https://www.google.com/search?q=${encodeURIComponent(query)}`; break;
-    case 'naver': url = `https://search.naver.com/search.naver?query=${encodeURIComponent(query)}`; break;
-    case 'daum': url = `https://search.daum.net/search?q=${encodeURIComponent(query)}`; break;
-    case 'yahoo': url = `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`; break;
-    case 'bing': url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`; break;
-    case 'nate': url = `https://search.daum.net/nate?q=${encodeURIComponent(query)}`; break;
-    case 'zum': url = `https://search.zum.com/search.zum?query=${encodeURIComponent(query)}`; break;
-    case 'youtube': url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`; break;
-    default: return;
+    list.innerHTML = '';
+    if (query && history.length > 0) {
+      list.style.display = 'block';
+      history.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        li.onclick = () => {
+          input.value = item;
+          list.style.display = 'none';
+        };
+        list.appendChild(li);
+      });
+    } else {
+      list.style.display = 'none';
+    }
   }
 
-  window.open(url, '_blank');
-  document.getElementById('autocomplete-list').style.display = 'none';
-}
+  // 검색어 저장 로직은 기존과 동일하게 유지
+  function search(engine) {
+    const input = document.getElementById('query');
+    const query = input.value.trim();
+    if (!query) return;
 
-// 외부 클릭 시 자동완성 목록 숨기기
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('#query') && !e.target.closest('#autocomplete-list')) {
+    // 저장
+    let history = getSearchHistory();
+    if (!history.includes(query)) {
+      history.unshift(query);
+      if (history.length > 10) history.pop();
+      localStorage.setItem("searchHistory", JSON.stringify(history));
+    }
+
+    // 검색 엔진 처리
+    let url = '';
+    switch(engine) {
+      case 'google': url = `https://www.google.com/search?q=${encodeURIComponent(query)}`; break;
+      case 'naver': url = `https://search.naver.com/search.naver?query=${encodeURIComponent(query)}`; break;
+      case 'daum': url = `https://search.daum.net/search?q=${encodeURIComponent(query)}`; break;
+      case 'yahoo': url = `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`; break;
+      case 'bing': url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`; break;
+      case 'nate': url = `https://search.daum.net/nate?q=${encodeURIComponent(query)}`; break;
+      case 'zum': url = `https://search.zum.com/search.zum?query=${encodeURIComponent(query)}`; break;
+      case 'youtube': url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`; break;
+    }
+    window.open(url, '_blank');
     document.getElementById('autocomplete-list').style.display = 'none';
   }
-});
 
-function startVoiceRecognition() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  // 클릭 외부 감지해서 리스트 숨기기
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#query') && !e.target.closest('#autocomplete-list')) {
+      document.getElementById('autocomplete-list').style.display = 'none';
+    }
+  });
+      function startVoiceRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  if (!SpeechRecognition) {
-    alert("이 브라우저는 음성 인식을 지원하지 않아요. 크롬을 사용해주세요.");
-    return;
+    if (!SpeechRecognition) {
+      alert("이 브라우저는 음성 인식을 지원하지 않아요. 크롬을 사용해주세요.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "ko-KR"; // 한국어 설정
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.start();
+
+    recognition.onresult = function(event) {
+      const speechResult = event.results[0][0].transcript;
+      document.getElementById("query").value = speechResult;
+      document.getElementById("autocomplete-list").style.display = 'none';
+    };
+
+    recognition.onerror = function(event) {
+      alert("음성 인식 오류: " + event.error);
+    };
   }
-
-  const recognition = new SpeechRecognition();
-  recognition.lang = "ko-KR";
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-
-  recognition.start();
-
-  recognition.onresult = function(event) {
-    const speechResult = event.results[0][0].transcript;
-    document.getElementById("query").value = speechResult;
-    document.getElementById("autocomplete-list").style.display = 'none';
-    showSuggestions();  // 음성 인식 후 자동완성 목록 보여주기 위해 호출
-  };
-
-  recognition.onerror = function(event) {
-    alert("음성 인식 오류: " + event.error);
-  };
-}
 </script>
 </body>
 </html>
