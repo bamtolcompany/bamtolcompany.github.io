@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -30,6 +31,15 @@
     <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#1AC8FF">
 <style>
+  .white {background-color:white;}
+  .white h1 {color:black;}
+  .white button {background-color:#FFFFA8;}
+  .dark {background-color:black;}
+  .dark button {color:white; background-color:gray;}
+  .dark legend {color:white;}
+  .yellow {background-color:lightyellow;}
+  .yellow h1 {color:black;}
+  .yellow .ai {background-color:lemonchiffon;}
   .category-section {text-align:center; margin:0px; padding:0px;}
   .category {text-align:center; width:110px; height:30px; font-size:18px; background-color:#FFFFA8; border-radius:5px;}
   #autocomplete-list li {
@@ -43,6 +53,7 @@
     background-color: #f0f0f0;
   }
 body {background-color:#1AC8FF;}
+  * {transition:0.3s;}
 h1 {color:white;}
 h4 {color:white;}
 h6 {color:white;}
@@ -51,15 +62,28 @@ a {font-size:40px; color:black; text-decoration:none;}
 button {background-color:yellow; width:300px; height:75px; border-radius:30px; margin:3px; font-size:40px;}
 input {width:100%; height:40px; font-size:100%; border-radius:30px;}
     .ai img {margin:5px;}
+  .ai {background-color:white;}
+  fieldset {width:300px;}
 </style>
 </head>
 <body>
   <header>
 <h1>올인원 검색-여러 검색엔진을 한곳에서 이용하세요.</h1>
+    <nav>
+      <fieldset>
+      <legend>테마</legend>
+<select id="theme-select" onchange="setTheme(this.value)">
+  <option value="none">기본</option>
+  <option value="white">화이트</option>
+  <option value="dark">다크</option>
+  <option value="yellow">옐로</option>
+</select>
+      </fieldset>
+    </nav>
   </header>
   <main>
     <section>
-      <div style="background-color:white; border-radius:20px; display:inline-flex; padding-left:20px; padding-right:20px;" class="ai">
+      <div style="border-radius:20px; display:inline-flex; padding-left:20px; padding-right:20px;" class="ai">
   <a href="https://gemini.google.com"><img src="https://www.gstatic.com/lamda/images/gemini_favicon_f069958c85030456e93de685481c559f160ea06b.png"></a>
     <a href="https://chatgpt.com"><img src="https://chatgpt.com/favicon.ico"></a>
     <a href="https://copilot.microsoft.com/"><img src="https://copilot.microsoft.com/favicon.ico"></a>
@@ -112,6 +136,9 @@ input {width:100%; height:40px; font-size:100%; border-radius:30px;}
     <p>&copy; 2025 bamtol company. All rights reserved.</p>
   </footer>
 <script>
+  function setTheme(value) {
+    document.body.className = value === 'none' ? '' : value;
+  }
   function getSearchHistory() {
     return JSON.parse(localStorage.getItem("searchHistory") || "[]");
   }
@@ -212,14 +239,6 @@ input {width:100%; height:40px; font-size:100%; border-radius:30px;}
       .then(() => console.log('Service Worker 등록 성공'))
       .catch(() => console.log('Service Worker 등록 실패'));
   }
-</script>
-    <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
-<script type="text/javascript">
-if(!wcs_add) var wcs_add = {};
-wcs_add["wa"] = "13352a6b233d900";
-if(window.wcs) {
-  wcs_do();
-}
 </script>
 </body>
 </html>
