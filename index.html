@@ -262,7 +262,7 @@ if(window.wcs) {
     const q = query(
       collection(db, "searches"),
       orderBy("timestamp", "desc"),
-      limit(20)
+      limit(80)
     );
     const snapshot = await getDocs(q);
     const results = [];
