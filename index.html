@@ -236,10 +236,19 @@ if(window.wcs) {
   wcs_do();
 }
 </script>
-  <script type="module">
+<script type="module">
   // 1. Firebase SDK 가져오기
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy,
+    limit,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
   // 2. Firebase 설정
   const firebaseConfig = {
@@ -256,7 +265,7 @@ if(window.wcs) {
   const db = getFirestore(app);
 
   // 4. 검색어 저장 함수 (전역에서 호출 가능하게 함)
-  window.saveSearchKeyword = async function(query) {
+  window.saveSearchKeyword = async function (query) {
     if (!query) return;
     try {
       await addDoc(collection(db, "searches"), {
@@ -266,6 +275,69 @@ if(window.wcs) {
       console.log("✅ 검색어 저장 완료:", query);
     } catch (error) {
       console.error("❌ 저장 실패:", error);
+    }
+  };
+
+  // 5. Firebase 자동완성 함수
+  async function fetchFirebaseSuggestions(input) {
+    if (!input) return [];
+    const q = query(
+      collection(db, "searches"),
+      orderBy("timestamp", "desc"),
+      limit(20)
+    );
+    const snapshot = await getDocs(q);
+    const results = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (
+        data.keyword &&
+        typeof data.keyword === "string" &&
+        data.keyword.toLowerCase().includes(input.toLowerCase())
+      ) {
+        results.push(data.keyword);
+      }
+    });
+    // 중복 제거 후 최신순 7개
+    return [...new Set(results)].slice(0, 7);
+  }
+
+  // 6. 자동완성 표시 함수 (기존 showSuggestions 완전히 대체)
+  window.showSuggestions = async function () {
+    const input = document.getElementById("query");
+    const list = document.getElementById("autocomplete-list");
+    const queryStr = input.value.trim().toLowerCase();
+
+    if (!queryStr) {
+      list.style.display = "none";
+      return;
+    }
+
+    // 로컬에서 3개
+    const localHistory = JSON.parse(localStorage.getItem("searchHistory") || "[]")
+      .filter((item) => item.toLowerCase().includes(queryStr))
+      .slice(0, 3);
+
+    // Firebase에서 7개
+    const firebaseSuggestions = await fetchFirebaseSuggestions(queryStr);
+
+    // 합치고 중복 제거, 최대 10개
+    const combined = [...new Set([...localHistory, ...firebaseSuggestions])].slice(0, 10);
+
+    list.innerHTML = "";
+    if (combined.length > 0) {
+      list.style.display = "block";
+      combined.forEach((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        li.onclick = () => {
+          input.value = item;
+          list.style.display = "none";
+        };
+        list.appendChild(li);
+      });
+    } else {
+      list.style.display = "none";
     }
   };
 </script>
