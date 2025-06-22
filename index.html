@@ -235,13 +235,12 @@ if(window.wcs) {
   wcs_do();
 }
 </script>
-    <script type="module">
-  // Import the functions you need from the SDKs you need
+  <script type="module">
+  // 1. Firebase SDK 가져오기
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
-  // Your web app's Firebase configuration
+  // 2. Firebase 설정
   const firebaseConfig = {
     apiKey: "AIzaSyBJeLFehOtmuxgxn2bwTiuYH_cjX0Psma8",
     authDomain: "all-in-one-search.firebaseapp.com",
@@ -251,8 +250,23 @@ if(window.wcs) {
     appId: "1:567332130804:web:6067fb442c2203f2fef3a1"
   };
 
-  // Initialize Firebase
+  // 3. Firebase 초기화
   const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // 4. 검색어 저장 함수 (전역에서 호출 가능하게 함)
+  window.saveSearchKeyword = async function(query) {
+    if (!query) return;
+    try {
+      await addDoc(collection(db, "searches"), {
+        keyword: query,
+        timestamp: serverTimestamp()
+      });
+      console.log("✅ 검색어 저장 완료:", query);
+    } catch (error) {
+      console.error("❌ 저장 실패:", error);
+    }
+  };
 </script>
 </body>
 </html>
