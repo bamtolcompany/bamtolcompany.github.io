@@ -130,29 +130,7 @@ input {width:100%; height:40px; font-size:100%; border-radius:30px;}
     return JSON.parse(localStorage.getItem("searchHistory") || "[]");
   }
 
-  function showSuggestions() {
-    const input = document.getElementById("query");
-    const list = document.getElementById("autocomplete-list");
-    const query = input.value.toLowerCase();
-    const history = getSearchHistory().filter(item => item.toLowerCase().includes(query));
-
-    list.innerHTML = '';
-    if (query && history.length > 0) {
-      list.style.display = 'block';
-      history.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = item;
-        li.onclick = () => {
-          input.value = item;
-          list.style.display = 'none';
-        };
-        list.appendChild(li);
-      });
-    } else {
-      list.style.display = 'none';
-    }
-  }
-
+ 
   // 검색어 저장 로직은 기존과 동일하게 유지
   function search(engine) {
     const input = document.getElementById('query');
@@ -160,7 +138,6 @@ input {width:100%; height:40px; font-size:100%; border-radius:30px;}
     if (!query) {
         alert("검색어를 입력하세요");
         return;}
-      saveSearchKeyword(query);
 
     // 저장
     let history = getSearchHistory();
