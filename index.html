@@ -215,7 +215,7 @@ if(window.wcs) {
 }
 </script>
 <script type="module">
-  // 1. Firebase SDK 가져오기
+  // 1. Firebase SDK import
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
   import {
     getFirestore,
@@ -225,7 +225,10 @@ if(window.wcs) {
     query,
     orderBy,
     limit,
-    serverTimestamp
+    serverTimestamp,
+    where,
+    updateDoc,
+    increment
   } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
   // 2. Firebase 설정
@@ -242,30 +245,51 @@ if(window.wcs) {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // 4. 검색어 저장 함수 (전역에서 호출 가능하게 함)
-  window.saveSearchKeyword = async function (query) {
-    if (!query) return;
+  // 4. 검색어 저장 함수 (count 필드 포함)
+  window.saveSearchKeyword = async function (queryText) {
+    if (!queryText) return;
+
     try {
-      await addDoc(collection(db, "searches"), {
-        keyword: query,
-        timestamp: serverTimestamp()
-      });
-      console.log("✅ 검색어 저장 완료:", query);
+      const q = query(
+        collection(db, "searches"),
+        where("keyword", "==", queryText)
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        // 이미 존재 → count 증가
+        const docRef = querySnapshot.docs[0].ref;
+        await updateDoc(docRef, {
+          count: increment(1),
+          timestamp: serverTimestamp()
+        });
+      } else {
+        // 새 키워드 → 새 문서 생성
+        await addDoc(collection(db, "searches"), {
+          keyword: queryText,
+          count: 1,
+          timestamp: serverTimestamp()
+        });
+      }
+
+      console.log("✅ 검색어 저장 완료:", queryText);
     } catch (error) {
       console.error("❌ 저장 실패:", error);
     }
   };
 
-  // 5. Firebase 자동완성 함수
+  // 5. Firebase 자동완성 - count 기준 정렬
   async function fetchFirebaseSuggestions(input) {
     if (!input) return [];
+
     const q = query(
       collection(db, "searches"),
-      orderBy("timestamp", "desc"),
-      limit(80)
+      orderBy("count", "desc"),
+      limit(64)
     );
     const snapshot = await getDocs(q);
     const results = [];
+
     snapshot.forEach((doc) => {
       const data = doc.data();
       if (
@@ -276,11 +300,12 @@ if(window.wcs) {
         results.push(data.keyword);
       }
     });
-    // 중복 제거 후 최신순 7개
+
+    // 중복 제거 후 최대 7개 반환
     return [...new Set(results)].slice(0, 7);
   }
 
-  // 6. 자동완성 표시 함수 (기존 showSuggestions 완전히 대체)
+  // 6. 자동완성 표시 함수
   window.showSuggestions = async function () {
     const input = document.getElementById("query");
     const list = document.getElementById("autocomplete-list");
@@ -291,15 +316,15 @@ if(window.wcs) {
       return;
     }
 
-    // 로컬에서 3개
+    // 로컬 기록 최대 3개
     const localHistory = JSON.parse(localStorage.getItem("searchHistory") || "[]")
       .filter((item) => item.toLowerCase().includes(queryStr))
       .slice(0, 3);
 
-    // Firebase에서 7개
+    // Firebase 인기 검색어 최대 7개
     const firebaseSuggestions = await fetchFirebaseSuggestions(queryStr);
 
-    // 합치고 중복 제거, 최대 10개
+    // 통합, 중복 제거, 최대 10개
     const combined = [...new Set([...localHistory, ...firebaseSuggestions])].slice(0, 10);
 
     list.innerHTML = "";
@@ -319,5 +344,6 @@ if(window.wcs) {
     }
   };
 </script>
+
 </body>
 </html>
