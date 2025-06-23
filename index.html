@@ -230,6 +230,10 @@ if(window.wcs) {
     updateDoc,
     increment
   } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+  import {
+    initializeAppCheck,
+    ReCaptchaV3Provider
+  } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app-check.js";
 
   // 2. Firebase 설정
   const firebaseConfig = {
@@ -245,43 +249,43 @@ if(window.wcs) {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  // ✅ App Check 초기화 (🔥 반드시 app 뒤에!)
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider("6LfDlWorAAAAABTEEoocA2Ud77VcUcSNFmEhSukN"),
+    isTokenAutoRefreshEnabled: true
+  });
+
   // 4. 검색어 저장 함수 (count 필드 포함)
   window.saveSearchKeyword = async function (queryText) {
     if (!queryText) return;
-
     try {
       const q = query(
         collection(db, "searches"),
         where("keyword", "==", queryText)
       );
       const querySnapshot = await getDocs(q);
-
       if (!querySnapshot.empty) {
-        // 이미 존재 → count 증가
         const docRef = querySnapshot.docs[0].ref;
         await updateDoc(docRef, {
           count: increment(1),
           timestamp: serverTimestamp()
         });
       } else {
-        // 새 키워드 → 새 문서 생성
         await addDoc(collection(db, "searches"), {
           keyword: queryText,
           count: 1,
           timestamp: serverTimestamp()
         });
       }
-
       console.log("✅ 검색어 저장 완료:", queryText);
     } catch (error) {
       console.error("❌ 저장 실패:", error);
     }
   };
 
-  // 5. Firebase 자동완성 - count 기준 정렬
+  // 5. Firebase 자동완성
   async function fetchFirebaseSuggestions(input) {
     if (!input) return [];
-
     const q = query(
       collection(db, "searches"),
       orderBy("count", "desc"),
@@ -289,7 +293,6 @@ if(window.wcs) {
     );
     const snapshot = await getDocs(q);
     const results = [];
-
     snapshot.forEach((doc) => {
       const data = doc.data();
       if (
@@ -300,8 +303,6 @@ if(window.wcs) {
         results.push(data.keyword);
       }
     });
-
-    // 중복 제거 후 최대 7개 반환
     return [...new Set(results)].slice(0, 7);
   }
 
@@ -310,23 +311,15 @@ if(window.wcs) {
     const input = document.getElementById("query");
     const list = document.getElementById("autocomplete-list");
     const queryStr = input.value.trim().toLowerCase();
-
     if (!queryStr) {
       list.style.display = "none";
       return;
     }
-
-    // 로컬 기록 최대 3개
     const localHistory = JSON.parse(localStorage.getItem("searchHistory") || "[]")
       .filter((item) => item.toLowerCase().includes(queryStr))
       .slice(0, 3);
-
-    // Firebase 인기 검색어 최대 7개
     const firebaseSuggestions = await fetchFirebaseSuggestions(queryStr);
-
-    // 통합, 중복 제거, 최대 10개
     const combined = [...new Set([...localHistory, ...firebaseSuggestions])].slice(0, 10);
-
     list.innerHTML = "";
     if (combined.length > 0) {
       list.style.display = "block";
@@ -344,6 +337,5 @@ if(window.wcs) {
     }
   };
 </script>
-
 </body>
 </html>
