@@ -247,14 +247,14 @@ if(window.wcs) {
 
   // 3. Firebase 초기화
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  //const db = getFirestore(app);
 
   // ✅ App Check 초기화 (🔥 반드시 app 뒤에!)
   initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider("6Lfm7GsrAAAAAOpwwhunYJBBhcJNEYKPF9mNH1Cr"),
     isTokenAutoRefreshEnabled: true
   });
-
+ const db = getFirestore(app);
   // 4. 검색어 저장 함수 (count 필드 포함)
   window.saveSearchKeyword = async function (queryText) {
     if (!queryText) return;
