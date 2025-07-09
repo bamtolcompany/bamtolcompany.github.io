@@ -1,22 +1,52 @@
-const CACHE_NAME = 'allinone-search-cache-v1';
-const faviconUrl = '/favicon.ico';
+const weekNumber = Math.floor(Date.now() / (1000 * 60 * 60 * 24 * 7));
+const CACHE_NAME = `allinone-search-cache-week-${weekNumber}`;
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/favicon.ico',
+  '/manifest.json',
+  '/service-worker.js',
+  '/ads.txt',
+  '/robots.txt',
+  '/404.html'
+];
 
+// 설치: 캐시 저장
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.add(faviconUrl))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
 });
 
+// 활성화: 오래된 캐시 삭제
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      )
+    )
+  );
+});
+
+// 요청: 네트워크 우선, 실패 시 캐시
 self.addEventListener('fetch', event => {
-  if (event.request.url.endsWith(faviconUrl)) {
-    // 파비콘 요청일 때만 캐시 확인
-    event.respondWith(
-      caches.match(event.request).then(response => {
-        return response || fetch(event.request);
+  event.respondWith(
+    fetch(event.request)
+      .then(networkResponse => {
+        if (
+          networkResponse &&
+          networkResponse.status === 200 &&
+          event.request.method === 'GET' &&
+          event.request.url.startsWith(self.location.origin)
+        ) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return networkResponse;
       })
-    );
-  } else {
-    // 나머지 요청은 무조건 네트워크에서 받아오기
-    event.respondWith(fetch(event.request));
-  }
+      .catch(() => caches.match(event.request))
+  );
 });
