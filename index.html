@@ -293,6 +293,8 @@ if(window.wcs) {
   // 5. Firebase 자동완성
   async function fetchFirebaseSuggestions(input) {
     if (!input) return [];
+
+      const bannedKeywords = ["욕1", "욕2", "욕3"];
     const q = query(
       collection(db, "searches"),
       orderBy("count", "desc"),
@@ -305,7 +307,8 @@ if(window.wcs) {
       if (
         data.keyword &&
         typeof data.keyword === "string" &&
-        data.keyword.toLowerCase().includes(input.toLowerCase())
+        data.keyword.toLowerCase().includes(input.toLowerCase()) &&
+          !bannedKeywords.includes(data.keyword.toLowerCase())
       ) {
         results.push(data.keyword);
       }
