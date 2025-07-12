@@ -295,7 +295,10 @@ if(window.wcs) {
   async function fetchFirebaseSuggestions(input) {
     if (!input) return [];
 
-      const bannedKeywords = ["욕1", "욕2", "욕3"];
+      const bannedKeywords = [ "시발", "좆", "병신", "개새끼", "엿먹어", "꺼져", "ㅄ", "ㅅㅂ", "ㅗ", "미친", "ㅂㅅ",
+  "fuck", "shit", "bitch", "asshole", "damn", "f u", "f-u", "f***", "s***",
+  "자살", "죽고싶다", "살인", "폭탄", "테러", "성폭력", "강간", "자해", "총기", "마약", "대마초",
+  "ISIS", "종북", "일베", "메갈", "좌파", "우파"];
     const q = query(
       collection(db, "searches"),
       orderBy("count", "desc"),
