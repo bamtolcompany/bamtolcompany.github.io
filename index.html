@@ -379,6 +379,9 @@ if(window.wcs) {
       list.style.display = "none";
     }
   };
+    getToken(appCheck, false).then(tokenResult => {
+  console.log("🔥 AppCheck token:", tokenResult.token);
+});
 </script>
 </body>
 </html>
