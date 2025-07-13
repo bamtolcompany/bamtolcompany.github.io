@@ -264,7 +264,7 @@ if(window.wcs) {
   });
 
   // 5. Firestore 초기화
-  const db = getFirestore(app);
+const db = initializeFirestore(app, {}); 
 
   // 6. 검색어 저장 함수 (count 필드 포함)
   window.saveSearchKeyword = async function (queryText) {
