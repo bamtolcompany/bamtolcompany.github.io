@@ -240,7 +240,8 @@ if(window.wcs) {
   } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
   import {
     initializeAppCheck,
-    ReCaptchaV3Provider
+    ReCaptchaV3Provider,
+    getToken
   } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app-check.js";
 
   // 2. Firebase 설정
@@ -255,23 +256,30 @@ if(window.wcs) {
 
   // 3. Firebase 초기화
   const app = initializeApp(firebaseConfig);
-  //const db = getFirestore(app);
 
-  // ✅ App Check 초기화 (🔥 반드시 app 뒤에!)
-  initializeAppCheck(app, {
+  // 4. App Check 초기화 (반드시 app 뒤에!)
+  const appCheck = initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider("6Lc2UIErAAAAABj_A_4CMoi4b7Ih3dr7MC3dzh8h"),
     isTokenAutoRefreshEnabled: true
   });
- const db = getFirestore(app);
-  // 4. 검색어 저장 함수 (count 필드 포함)
+
+  // 5. Firestore 초기화
+  const db = getFirestore(app);
+
+  // 6. 검색어 저장 함수 (count 필드 포함)
   window.saveSearchKeyword = async function (queryText) {
     if (!queryText) return;
+
     try {
+      // App Check 토큰 강제 확인 (저장도 App Check 있어야 함)
+      await getToken(appCheck, /* forceRefresh= */ false);
+
       const q = query(
         collection(db, "searches"),
         where("keyword", "==", queryText)
       );
       const querySnapshot = await getDocs(q);
+
       if (!querySnapshot.empty) {
         const docRef = querySnapshot.docs[0].ref;
         await updateDoc(docRef, {
@@ -291,50 +299,71 @@ if(window.wcs) {
     }
   };
 
-  // 5. Firebase 자동완성
+  // 7. Firebase 자동완성 함수
   async function fetchFirebaseSuggestions(input) {
     if (!input) return [];
 
-      const bannedKeywords = [ "시발", "좆", "병신", "개새끼", "엿먹어", "꺼져", "ㅄ", "ㅅㅂ", "ㅗ", "미친", "ㅂㅅ",
-  "fuck", "shit", "bitch", "asshole", "damn", "f u", "f-u", "f***", "s***",
-  "자살", "죽고싶다", "살인", "폭탄", "테러", "성폭력", "강간", "자해", "총기", "마약", "대마초",
-  "ISIS", "종북", "일베", "메갈", "좌파", "우파"];
-    const q = query(
-      collection(db, "searches"),
-      orderBy("count", "desc"),
-      limit(64)
-    );
-    const snapshot = await getDocs(q);
-    const results = [];
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      if (
-        data.keyword &&
-        typeof data.keyword === "string" &&
-        data.keyword.toLowerCase().includes(input.toLowerCase()) &&
+    try {
+      // App Check 토큰 강제 확인 (읽기도 App Check 있어야 함)
+      await getToken(appCheck, /* forceRefresh= */ false);
+    } catch (e) {
+      console.error("❌ App Check 토큰 실패:", e);
+      return [];
+    }
+
+    const bannedKeywords = [
+      "시발", "좆", "병신", "개새끼", "엿먹어", "꺼져", "ㅄ", "ㅅㅂ", "ㅗ", "미친", "ㅂㅅ",
+      "fuck", "shit", "bitch", "asshole", "damn", "f u", "f-u", "f***", "s***",
+      "자살", "죽고싶다", "살인", "폭탄", "테러", "성폭력", "강간", "자해", "총기", "마약", "대마초",
+      "ISIS", "종북", "일베", "메갈", "좌파", "우파"
+    ];
+
+    try {
+      const q = query(
+        collection(db, "searches"),
+        orderBy("count", "desc"),
+        limit(64)
+      );
+      const snapshot = await getDocs(q);
+      const results = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if (
+          data.keyword &&
+          typeof data.keyword === "string" &&
+          data.keyword.toLowerCase().includes(input.toLowerCase()) &&
           !bannedKeywords.includes(data.keyword.toLowerCase())
-      ) {
-        results.push(data.keyword);
-      }
-    });
-    return [...new Set(results)].slice(0, 7);
+        ) {
+          results.push(data.keyword);
+        }
+      });
+      return [...new Set(results)].slice(0, 7);
+    } catch (error) {
+      console.error("❌ Firestore 자동완성 실패:", error);
+      return [];
+    }
   }
 
-  // 6. 자동완성 표시 함수
+  // 8. 자동완성 표시 함수
   window.showSuggestions = async function () {
     const input = document.getElementById("query");
     const list = document.getElementById("autocomplete-list");
     const queryStr = input.value.trim().toLowerCase();
+
     if (!queryStr) {
       list.style.display = "none";
       return;
     }
+
     const localHistory = JSON.parse(localStorage.getItem("searchHistory") || "[]")
       .filter((item) => item.toLowerCase().includes(queryStr))
       .slice(0, 3);
+
     const firebaseSuggestions = await fetchFirebaseSuggestions(queryStr);
+
     const combined = [...new Set([...localHistory, ...firebaseSuggestions])].slice(0, 10);
     list.innerHTML = "";
+
     if (combined.length > 0) {
       list.style.display = "block";
       combined.forEach((item) => {
