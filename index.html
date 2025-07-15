@@ -223,7 +223,6 @@ if(window.wcs) {
 }
 </script>
 <script type="module">
-  // Firebase SDK import
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
   import {
     getFirestore,
@@ -244,7 +243,7 @@ if(window.wcs) {
     getToken
   } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app-check.js";
 
-  // Firebase 설정
+  // ✅ Firebase 설정 (실제 서비스용)
   const firebaseConfig = {
     apiKey: "AIzaSyBJeLFehOtmuxgxn2bwTiuYH_cjX0Psma8",
     authDomain: "all-in-one-search.firebaseapp.com",
@@ -254,24 +253,23 @@ if(window.wcs) {
     appId: "1:567332130804:web:6067fb442c2203f2fef3a1"
   };
 
-  // Firebase 초기화
+  // ✅ Firebase 초기화
   const app = initializeApp(firebaseConfig);
 
-  // App Check 설정
+  // ✅ App Check 초기화 (실서비스용: 디버그 토큰 제거!)
   const appCheck = initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider("6Lc2UIErAAAAABj_A_4CMoi4b7Ih3dr7MC3dzh8h"),
     isTokenAutoRefreshEnabled: true
   });
 
-  // Firestore 연결
+  // ✅ Firestore 연결
   const db = getFirestore(app);
 
-  // 검색어 저장
+  // ✅ 검색어 저장 함수 (중복은 count +1)
   window.saveSearchKeyword = async function (queryText) {
     if (!queryText) return;
-
     try {
-      await getToken(appCheck, false);
+      await getToken(appCheck, true);
 
       const q = query(
         collection(db, "searches"),
@@ -292,29 +290,34 @@ if(window.wcs) {
           timestamp: serverTimestamp()
         });
       }
-
-      console.log("✅ 검색어 저장 완료:", queryText);
     } catch (error) {
-      console.error("❌ 검색어 저장 실패:", error);
+      console.error("❌ Firestore 저장 실패:", error);
     }
   };
 
-  // 자동완성 검색어 가져오기
-  async function fetchFirebaseSuggestions(input) {
-    if (!input) return [];
+  // ✅ 자동완성 함수
+  window.showSuggestions = async function () {
+    const input = document.getElementById("query");
+    const list = document.getElementById("autocomplete-list");
+    const queryStr = input.value.trim().toLowerCase();
 
-    try {
-      await getToken(appCheck, false);
-    } catch (e) {
-      console.error("❌ App Check 토큰 실패:", e);
-      return [];
+    if (!queryStr) {
+      list.style.display = "none";
+      return;
     }
 
-    const bannedKeywords = [
+    try {
+      await getToken(appCheck, true);
+    } catch (e) {
+      console.error("❌ App Check 실패:", e);
+      return;
+    }
+
+    const banned = [
       "시발", "좆", "병신", "개새끼", "엿먹어", "꺼져", "ㅄ", "ㅅㅂ", "ㅗ", "미친", "ㅂㅅ",
       "fuck", "shit", "bitch", "asshole", "damn", "f u", "f-u", "f***", "s***",
-      "자살", "죽고싶다", "살인", "폭탄", "테러", "성폭력", "강간", "자해", "총기", "마약", "대마초",
-      "ISIS", "종북", "일베", "메갈", "좌파", "우파"
+      "자살", "죽고싶다", "살인", "폭탄", "테러", "성폭력", "강간", "자해", "총기", "마약",
+      "대마초", "ISIS", "종북", "일베", "메갈", "좌파", "우파"
     ];
 
     try {
@@ -330,61 +333,33 @@ if(window.wcs) {
         if (
           data.keyword &&
           typeof data.keyword === "string" &&
-          data.keyword.toLowerCase().includes(input.toLowerCase()) &&
-          !bannedKeywords.includes(data.keyword.toLowerCase())
+          data.keyword.toLowerCase().includes(queryStr) &&
+          !banned.includes(data.keyword.toLowerCase())
         ) {
           results.push(data.keyword);
         }
       });
-      return [...new Set(results)].slice(0, 7);
+
+      const unique = [...new Set(results)].slice(0, 7);
+      list.innerHTML = "";
+      if (unique.length > 0) {
+        list.style.display = "block";
+        unique.forEach((item) => {
+          const li = document.createElement("li");
+          li.textContent = item;
+          li.onclick = () => {
+            input.value = item;
+            list.style.display = "none";
+          };
+          list.appendChild(li);
+        });
+      } else {
+        list.style.display = "none";
+      }
     } catch (error) {
-      console.error("❌ 자동완성 실패:", error);
-      return [];
-    }
-  }
-
-  // 자동완성 표시
-  window.showSuggestions = async function () {
-    const input = document.getElementById("query");
-    const list = document.getElementById("autocomplete-list");
-    const queryStr = input.value.trim().toLowerCase();
-
-    if (!queryStr) {
-      list.style.display = "none";
-      return;
-    }
-
-    const localHistory = JSON.parse(localStorage.getItem("searchHistory") || "[]")
-      .filter((item) => item.toLowerCase().includes(queryStr))
-      .slice(0, 3);
-
-    const firebaseSuggestions = await fetchFirebaseSuggestions(queryStr);
-    const combined = [...new Set([...localHistory, ...firebaseSuggestions])].slice(0, 10);
-
-    list.innerHTML = "";
-
-    if (combined.length > 0) {
-      list.style.display = "block";
-      combined.forEach((item) => {
-        const li = document.createElement("li");
-        li.textContent = item;
-        li.onclick = () => {
-          input.value = item;
-          list.style.display = "none";
-        };
-        list.appendChild(li);
-      });
-    } else {
-      list.style.display = "none";
+      console.error("❌ 자동완성 에러:", error);
     }
   };
-
-  // AppCheck 토큰 확인 로그
-  getToken(appCheck, false).then(tokenResult => {
-    console.log("🔥 AppCheck token:", tokenResult.token);
-  }).catch(error => {
-    console.error("❌ AppCheck 토큰 에러:", error);
-  });
 </script>
 </body>
 </html>
