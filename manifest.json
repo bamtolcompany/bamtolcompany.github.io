@@ -1,0 +1,21 @@
+{
+  "name": "올인원 검색",
+  "short_name": "올인원 검색",
+  "start_url": "https://bamtolcompany.github.io/",
+  "scope": "https://bamtolcompany.github.io/",
+  "display": "standalone",
+  "background_color": "#1AC8FF",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
