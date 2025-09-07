@@ -186,7 +186,7 @@
     #weekly-top-queries {
       list-style-position: inside;
     }
-    li:hover {
+    .list:hover {
       color:#0051ff;
       font-size: larger;
       text-decoration: underline;
@@ -337,6 +337,7 @@
 
         data.forEach(item => {
           const li = document.createElement("li");
+          li.classList.add("list")
           li.textContent = item.query; // 검색어만 표시
           li.style.cursor = "pointer";
           li.addEventListener("click", () => {
@@ -358,6 +359,7 @@
 
         data.forEach(item => {
           const li = document.createElement("li");
+          li.classList.add("list")
           li.textContent = item.query; // 검색어만 표시
           li.style.cursor = "pointer";
           li.addEventListener("click", () => {
