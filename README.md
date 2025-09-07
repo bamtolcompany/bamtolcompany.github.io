@@ -1,5 +1,2 @@
-이 사이트의 url
-https://bamtolcompany.github.io/
-https://bamtolcompany.github.io/allinonenews/
-https://bamtolcompany.github.io/allinoneshopping/
-https://bamtolcompany.github.io/allinonemusic/
+**올인원 검색 기능 설명**
+검색창에 검색어 넣고 검색엔진 버튼 누르면 그 검색엔진으로 검색이 됩니다. 검색어 저장이 됩니다.

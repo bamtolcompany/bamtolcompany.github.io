@@ -169,6 +169,24 @@
       width: 300px;
     }
 
+    .tops {
+      display: flex;
+      gap: 10px;
+    }
+
+    .top {
+      width: 40%;
+      background-color: #85e3ff;
+      padding: 5px;
+      border-radius: 10px;
+      margin: 8px;
+      text-align: center;
+    }
+    #top-queries,
+    #weekly-top-queries {
+      list-style-position: inside;
+    }
+
     @media (max-width:480px) {
       .engine {
         text-align: center;
@@ -246,40 +264,48 @@
       <button onclick="search('nate')">네이트 검색</button>
       <button onclick="search('zum')">줌 검색</button>
     </div>
-    <h3>인기 검색어 TOP10</h3>
-    <ul id="top-queries"></ul>
+    <div class="tops">
+      <div class="top">
+        <h3>인기 검색어 TOP10</h3>
+        <ul id="top-queries"></ul>
+      </div>
+      <div class="top">
+        <h3>주간 인기 검색어</h3>
+        <ui id="weekly-top-queries"></ui>
+      </div>
+    </div>
   </main>
   <footer>
     <a href="https://bamtolcompany.github.io/products" class="ignore">밤톨 서비스</a>
     <p>&copy; 2025 bamtol company. All rights reserved.</p>
   </footer>
-<script>
-const SAVE_API_URL = "https://backend-bzep.onrender.com/api/save-query";
-const AUTOCOMPLETE_API_URL = "https://backend-bzep.onrender.com/api/autocomplete";
-const TOP_QUERIES_API_URL = "https://backend-bzep.onrender.com/api/top-queries";
+  <script>
+    const SAVE_API_URL = "https://backend-bzep.onrender.com/api/save-query";
+    const AUTOCOMPLETE_API_URL = "https://backend-bzep.onrender.com/api/autocomplete";
+    const TOP_QUERIES_API_URL = "https://backend-bzep.onrender.com/api/top-queries";
 
-function saveQuery(query) {
-    if (!query) return;
+    function saveQuery(query) {
+      if (!query) return;
 
-    fetch(SAVE_API_URL, {
+      fetch(SAVE_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query })
-    })
-    .then(res => res.json())
-    .then(data => console.log("Query saved:", data))
-    .catch(err => console.error("저장 실패:", err));
-}
+      })
+        .then(res => res.json())
+        .then(data => console.log("Query saved:", data))
+        .catch(err => console.error("저장 실패:", err));
+    }
 
-function search(engine) {
-    const input = document.getElementById('query');
-    const query = input.value.trim();
-    if (!query) { alert("검색어를 입력하세요"); return; }
+    function search(engine) {
+      const input = document.getElementById('query');
+      const query = input.value.trim();
+      if (!query) { alert("검색어를 입력하세요"); return; }
 
-    saveQuery(query);
+      saveQuery(query);
 
-    let url = '';
-    switch(engine) {
+      let url = '';
+      switch (engine) {
         case 'google': url = `https://www.google.com/search?q=${encodeURIComponent(query)}`; break;
         case 'naver': url = `https://search.naver.com/search.naver?query=${encodeURIComponent(query)}`; break;
         case 'daum': url = `https://search.daum.net/search?q=${encodeURIComponent(query)}`; break;
@@ -292,44 +318,64 @@ function search(engine) {
         case 'video': url = `https://www.google.com/search?tbm=vid&q=${encodeURIComponent(query)}`; break;
         case 'blog': url = `https://search.naver.com/search.naver?ssc=tab.blog.all&sm=tab_jum&query=${encodeURIComponent(query)}`; break;
         case 'naverKnowledgeIn': url = `https://search.naver.com/search.naver?ssc=tab.kin.kqna&where=kin&sm=tab_jum&query=${encodeURIComponent(query)}`; break;
+      }
+      window.open(url, '_blank');
     }
-    window.open(url, '_blank');
-}
 
-// 인기 검색어 불러오기
-async function loadTopQueries() {
-    try {
+    // 인기 검색어 불러오기
+    async function loadTopQueries() {
+      try {
         const res = await fetch(TOP_QUERIES_API_URL);
-        const data = await res.json(); // [{query, count}, ...]
+        const data = await res.json();
         const list = document.getElementById("top-queries");
         list.innerHTML = "";
 
         data.forEach(item => {
-            const li = document.createElement("li");
-            li.textContent = item.query; // 검색어만 표시
-            li.style.cursor = "pointer";
-            li.addEventListener("click", () => {
-                document.getElementById('query').value = item.query;
-            });
-            list.appendChild(li);
+          const li = document.createElement("li");
+          li.textContent = item.query; // 검색어만 표시
+          li.style.cursor = "pointer";
+          li.addEventListener("click", () => {
+            document.getElementById('query').value = item.query;
+          });
+          list.appendChild(li);
         });
-    } catch (err) {
+      } catch (err) {
         console.error("인기 검색어 불러오기 에러:", err);
+      }
     }
-}
+    const WEEKLY_TOP_QUERIES_API_URL = "https://backend-bzep.onrender.com/api/weekly-top-queries";
+    async function loadWeeklyTopQueries() {
+      try {
+        const res = await fetch(WEEKLY_TOP_QUERIES_API_URL);
+        const data = await res.json();
+        const list = document.getElementById("weekly-top-queries");
+        list.innerHTML = "";
 
-// 페이지 로드 시 인기 검색어 자동 로딩
-window.addEventListener("DOMContentLoaded", loadTopQueries);
+        data.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = item.query; // 검색어만 표시
+          li.style.cursor = "pointer";
+          li.addEventListener("click", () => {
+            document.getElementById('query').value = item.query;
+          });
+          list.appendChild(li);
+        });
+      } catch (err) {
+        console.error("인기 검색어 불러오기 에러:", err);
+      }
+    }
 
-/* ----------------- 기존 자동완성 코드 ----------------- */
-const inputBox = document.getElementById('query');
-const autocompleteList = document.getElementById('autocomplete-list');
+    // 페이지 로드 시 인기 검색어 자동 로딩
+    window.addEventListener("DOMContentLoaded", loadTopQueries);
 
-inputBox.addEventListener('input', async () => {
-    const q = inputBox.value.trim();
-    if (!q) { autocompleteList.style.display = 'none'; return; }
+    const inputBox = document.getElementById('query');
+    const autocompleteList = document.getElementById('autocomplete-list');
 
-    try {
+    inputBox.addEventListener('input', async () => {
+      const q = inputBox.value.trim();
+      if (!q) { autocompleteList.style.display = 'none'; return; }
+
+      try {
         const res = await fetch(`${AUTOCOMPLETE_API_URL}?q=${encodeURIComponent(q)}`);
         const suggestions = await res.json();
 
@@ -337,61 +383,61 @@ inputBox.addEventListener('input', async () => {
         if (suggestions.length === 0) { autocompleteList.style.display = 'none'; return; }
 
         suggestions.forEach(s => {
-            const li = document.createElement('li');
-            li.textContent = s;
-            li.addEventListener('click', () => {
-                inputBox.value = s;
-                autocompleteList.style.display = 'none';
-            });
-            autocompleteList.appendChild(li);
+          const li = document.createElement('li');
+          li.textContent = s;
+          li.addEventListener('click', () => {
+            inputBox.value = s;
+            autocompleteList.style.display = 'none';
+          });
+          autocompleteList.appendChild(li);
         });
         autocompleteList.style.display = 'block';
-    } catch (err) {
+      } catch (err) {
         console.error("자동완성 에러:", err);
-    }
-});
+      }
+    });
 
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('#query') && !e.target.closest('#autocomplete-list')) {
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#query') && !e.target.closest('#autocomplete-list')) {
         autocompleteList.style.display = 'none';
-    }
-});
+      }
+    });
 
-/* ----------------- 나머지 기존 코드 ----------------- */
-function startVoiceRecognition() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) { alert("이 브라우저는 음성 인식을 지원하지 않아요. 크롬을 사용해주세요."); return; }
+    /* ----------------- 나머지 기존 코드 ----------------- */
+    function startVoiceRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) { alert("이 브라우저는 음성 인식을 지원하지 않아요. 크롬을 사용해주세요."); return; }
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = "ko-KR";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognition.start();
+      const recognition = new SpeechRecognition();
+      recognition.lang = "ko-KR";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.start();
 
-    recognition.onresult = function(event) {
+      recognition.onresult = function (event) {
         inputBox.value = event.results[0][0].transcript;
-    };
+      };
 
-    recognition.onerror = function(event) {
+      recognition.onerror = function (event) {
         alert("음성 인식 오류: " + event.error);
-    };
-}
+      };
+    }
 
-function setTheme(value) {
-    document.body.className = value === 'none' ? '' : value;
-    localStorage.setItem("테마", document.body.className);
-}
+    function setTheme(value) {
+      document.body.className = value === 'none' ? '' : value;
+      localStorage.setItem("테마", document.body.className);
+    }
 
-const savedTheme = localStorage.getItem("테마") || "none";
-document.body.className = savedTheme === "none" ? "" : savedTheme;
-document.getElementById('theme-select').value = savedTheme;
+    const savedTheme = localStorage.getItem("테마") || "none";
+    document.body.className = savedTheme === "none" ? "" : savedTheme;
+    document.getElementById('theme-select').value = savedTheme;
 
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(() => console.log('Service Worker 등록 성공'))
-      .catch(() => console.log('Service Worker 등록 실패'));
-}
-</script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(() => console.log('Service Worker 등록 성공'))
+        .catch(() => console.log('Service Worker 등록 실패'));
+    }
+  </script>
   <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
   <script type="text/javascript">
     if (!wcs_add) var wcs_add = {};
