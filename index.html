@@ -271,7 +271,7 @@
       </div>
       <div class="top">
         <h3>주간 인기 검색어</h3>
-        <ui id="weekly-top-queries"></ui>
+        <ul id="weekly-top-queries"></ul>
       </div>
     </div>
   </main>
@@ -366,7 +366,10 @@
     }
 
     // 페이지 로드 시 인기 검색어 자동 로딩
-    window.addEventListener("DOMContentLoaded", loadTopQueries);
+    window.addEventListener("DOMContentLoaded", () => {
+      loadTopQueries();
+      loadWeeklyTopQueries();
+    });
 
     const inputBox = document.getElementById('query');
     const autocompleteList = document.getElementById('autocomplete-list');
