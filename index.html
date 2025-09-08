@@ -180,16 +180,15 @@
       padding: 5px;
       border-radius: 10px;
       margin: 8px;
-      text-align: center;
-    }
-    #top-queries,
-    #weekly-top-queries {
-      list-style-position: inside;
     }
     .list:hover {
       color:#0051ff;
       font-size: larger;
       text-decoration: underline;
+    }
+
+    h3 {
+      text-align: center;
     }
 
     @media (max-width:480px) {
@@ -272,11 +271,11 @@
     <div class="tops">
       <div class="top">
         <h3>인기 검색어 TOP10</h3>
-        <ul id="top-queries"></ul>
+        <ol id="top-queries"></ol>
       </div>
       <div class="top">
         <h3>주간 인기 검색어</h3>
-        <ul id="weekly-top-queries"></ul>
+        <ol id="weekly-top-queries"></ol>
       </div>
     </div>
   </main>
