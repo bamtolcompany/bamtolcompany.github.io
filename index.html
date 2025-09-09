@@ -181,8 +181,9 @@
       border-radius: 10px;
       margin: 8px;
     }
+
     .list:hover {
-      color:#0051ff;
+      color: #0051ff;
       font-size: larger;
       text-decoration: underline;
     }
@@ -412,7 +413,25 @@
       }
     });
 
-    /* ----------------- 나머지 기존 코드 ----------------- */
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement !== inputBox) {
+        e.preventDefault();
+        inputBox.focus();
+        return;
+      }
+
+      if (e.ctrlKey && e.altKey) {
+        e.preventDefault();
+        const key = e.key.toUpperCase();
+        switch (key) {
+          case 'G': search('google'); break;
+          case 'N': search('naver'); break;
+          case 'Y': search('youtube'); break;
+        }
+      }
+    });
+
+
     function startVoiceRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) { alert("이 브라우저는 음성 인식을 지원하지 않아요. 크롬을 사용해주세요."); return; }
