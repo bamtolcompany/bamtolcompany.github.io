@@ -129,7 +129,7 @@
       color: white;
     }
 
-    a:not(.ignore) {
+    a:not(.ignore, .footer-link) {
       font-size: 40px;
       color: black;
       text-decoration: none;
@@ -190,6 +190,21 @@
 
     h3 {
       text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      background-color: #c2f1ff;
+      padding: 10px;
+    }
+    .footer-link {
+      color: black;
+      text-decoration: none;
+      margin: 10px;
+    }
+    .footer-link:hover {
+      text-decoration: underline;
+      color: #0051ff;
     }
 
     @media (max-width:480px) {
@@ -281,8 +296,9 @@
     </div>
   </main>
   <footer>
-    <a href="https://bamtolcompany.github.io/products" class="ignore">밤톨 서비스</a>
-    <a href="https://bamtolcompany.github.io/support" class="ignore">도움말</a>
+    <a href="https://bamtolcompany.github.io/products" class="footer-link">밤톨 서비스</a>
+    <a href="https://bamtolcompany.github.io/support" class="footer-link">도움말</a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZXzol5qk6zGwrMvAco9f3M1QumJ6W2ut0g7egWFUfzHB5ig/viewform?usp=header" class="footer-link">피드백 및 버그 신고</a>
     <p>&copy; 2025 bamtol company. All rights reserved.</p>
   </footer>
   <script>
