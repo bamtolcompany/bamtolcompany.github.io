@@ -282,6 +282,7 @@
   </main>
   <footer>
     <a href="https://bamtolcompany.github.io/products" class="ignore">밤톨 서비스</a>
+    <a href="https://bamtolcompany.github.io/support"
     <p>&copy; 2025 bamtol company. All rights reserved.</p>
   </footer>
   <script>
@@ -325,6 +326,7 @@
         case 'naverKnowledgeIn': url = `https://search.naver.com/search.naver?ssc=tab.kin.kqna&where=kin&sm=tab_jum&query=${encodeURIComponent(query)}`; break;
       }
       window.open(url, '_blank');
+      localStorage.setItem("recentSearchEngine", engine);
     }
 
     // 인기 검색어 불러오기
@@ -418,6 +420,14 @@
         e.preventDefault();
         inputBox.focus();
         return;
+      }
+      if (e.key === 'Enter') {
+        const engine = localStorage.getItem("recentSearchEngine");
+        if (engine == null) {
+          alert("최근에 사용한 검색엔진이 없습니다");
+          return;
+        }
+        search(engine);
       }
 
       if (e.ctrlKey && e.altKey) {
