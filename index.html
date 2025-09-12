@@ -114,9 +114,11 @@
       padding: 0;
       margin: 0;
     }
+
     main {
       padding: 8px;
     }
+
     header {
       padding: 8px;
     }
@@ -216,8 +218,18 @@
       text-decoration: underline;
       color: #0051ff;
     }
+
     .adsbygoogle {
       margin-bottom: 5px;
+    }
+
+
+    .about-sites {
+      text-align: center;
+    }
+    .about-sites div {
+      display: inline-block;
+      vertical-align: middle;
     }
 
     @media (max-width:480px) {
@@ -257,7 +269,17 @@
       <a href="https://copilot.microsoft.com/"><img src="https://copilot.microsoft.com/favicon.ico"></a>
     </div>
 
-    <div style="text-align:center;">
+    <div class="about-sites">
+      <div>
+        <div style="text-align: left;">
+        <div id="time" class="time"></div><br>
+        <div id="weather" class="weather"></div>
+      </div>
+      </div>
+      <div style="text-align: left;">
+        <div id="time" class="time"></div><br>
+        <div id="weather" class="weather"></div>
+      </div>
       <button style="width:130px; height:45px; background-color:gray; border-radius:5px;">
         <a href="https://bamtolcompany.github.io/allinonenews/" style="font-size:20px;">올인원 뉴스</a>
       </button>
@@ -330,6 +352,7 @@
     const SAVE_API_URL = "https://backend-bzep.onrender.com/api/save-query";
     const AUTOCOMPLETE_API_URL = "https://backend-bzep.onrender.com/api/autocomplete";
     const TOP_QUERIES_API_URL = "https://backend-bzep.onrender.com/api/top-queries";
+    var language = navigator.language;
 
     function saveQuery(query) {
       if (!query) return;
@@ -488,7 +511,7 @@
       if (!SpeechRecognition) { alert("이 브라우저는 음성 인식을 지원하지 않아요. 크롬을 사용해주세요."); return; }
 
       const recognition = new SpeechRecognition();
-      recognition.lang = "ko-KR";
+      recognition.lang = language;
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
       recognition.start();
@@ -501,11 +524,79 @@
         alert("음성 인식 오류: " + event.error);
       };
     }
+    function setTime(lang) {
+      const time = document.getElementById("time");
+      const options = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+      };
+      time.innerHTML = Intl.DateTimeFormat(lang, options).format(new Date());
+    }
+    function getCityName(lat, lon, callback) {
+      var url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+      fetch(url)
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+          var city = data.address.city || data.address.town || data.address.village || data.address.county || "Unknown";
+          callback(city);
+        })
+        .catch(function(err) {
+          console.error(err);
+          callback("Unknown");
+        });
+    }
+
+    // 3️⃣ 날씨 가져오기
+    function getWeather(location) {
+      if (!location) {
+        // 인자가 없으면 자동으로 위치 감지
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+            getCityName(lat, lon, function(city) {
+              fetchWeather(city);
+            });
+          }, function(err) {
+            console.error(err);
+            fetchWeather("Seoul");
+          });
+        } else {
+          fetchWeather("Seoul");
+        }
+      } else {
+        fetchWeather(location);
+      }
+    }
+
+    function fetchWeather(location) {
+      fetch(`https://wttr.in/${location}?format=j1`)
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+          var current = data.current_condition[0];
+          document.getElementById("weather").innerHTML =
+            `${location} 날씨: ${current.weatherDesc[0].value}, 온도: ${current.temp_C}°C`;
+        })
+        .catch(function(err) {
+          document.getElementById("weather").innerHTML = "날씨 정보를 가져올 수 없습니다.";
+          console.error(err);
+        });
+    }
 
     function setTheme(value) {
       document.body.className = value === 'none' ? '' : value;
       localStorage.setItem("테마", document.body.className);
     }
+    setTime(language);
+    setInterval(function() {
+      setTime(language);
+    }, 1000)
+    getWeather()
 
     const savedTheme = localStorage.getItem("테마") || "none";
     document.body.className = savedTheme === "none" ? "" : savedTheme;
