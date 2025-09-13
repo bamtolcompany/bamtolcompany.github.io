@@ -227,23 +227,29 @@
     .about-sites {
       text-align: center;
     }
-    .window .category{
+
+    .window .category {
       font-size: small;
     }
+
     .window input {
       font-size: large;
     }
+
     .window .engine button {
       font-size: 30px;
     }
+
     .window h1 {
       font-size: 40px;
     }
+
     .window .top {
       background-color: blue;
       color: white;
       border-radius: 0;
     }
+
     .window {
       background-color: #00b899 !important;
     }
@@ -285,8 +291,8 @@
       <a href="https://chatgpt.com"><img src="https://chatgpt.com/favicon.ico"></a>
       <a href="https://copilot.microsoft.com/"><img src="https://copilot.microsoft.com/favicon.ico"></a>
     </div>
-        <div id="time" class="time"></div>
-        <div id="weather" class="weather"></div>
+    <div id="time" class="time"></div>
+    <div id="weather" class="weather"></div>
     <div class="about-sites">
       <button style="width:130px; height:45px; background-color:gray; border-radius:5px;">
         <a href="https://bamtolcompany.github.io/allinonenews/" style="font-size:20px;">올인원 뉴스</a>
@@ -545,78 +551,111 @@
       };
       time.innerHTML = Intl.DateTimeFormat(lang, options).format(new Date());
     }
+    function getWeather(location) {
+      if (!location) {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            getCityName(lat, lon, function (city) {
+              fetchWeather(lat, lon, city);
+            });
+          }, function (err) {
+            console.error(err);
+            fetchWeather(37.5665, 126.9780, "Seoul");
+          });
+        } else {
+          fetchWeather(37.5665, 126.9780, "Seoul");
+        }
+      } else {
+        // 도시 이름으로 좌표 가져오기
+        getCityCoordinates(location, function (lat, lon, city) {
+          fetchWeather(lat, lon, city);
+        });
+      }
+    }
+
     function getCityName(lat, lon, callback) {
-      var url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
-      fetch(url)
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-          var city = data.address.city || data.address.town || data.address.village || data.address.county || "Unknown";
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+        .then(res => res.json())
+        .then(data => {
+          const city = data.address.city || data.address.town || data.address.village || data.address.county || "Unknown";
           callback(city);
         })
-        .catch(function(err) {
+        .catch(err => {
           console.error(err);
           callback("Unknown");
         });
     }
 
-    // 3️⃣ 날씨 가져오기
-    function getWeather(location) {
-      if (!location) {
-        // 인자가 없으면 자동으로 위치 감지
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(function(position) {
-            var lat = position.coords.latitude;
-            var lon = position.coords.longitude;
-            getCityName(lat, lon, function(city) {
-              fetchWeather(city);
-            });
-          }, function(err) {
-            console.error(err);
-            fetchWeather("Seoul");
-          });
-        } else {
-          fetchWeather("Seoul");
-        }
-      } else {
-        fetchWeather(location);
-      }
-    }
-
-    function fetchWeather(location) {
-      fetch(`https://wttr.in/${location}?format=j1`)
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-          var current = data.current_condition[0];
-          document.getElementById("weather").innerHTML =
-            `${location} 날씨: ${current.weatherDesc[0].value}, 온도: ${current.temp_C}°C`;
+    function getCityCoordinates(city, callback) {
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.length > 0) {
+            callback(parseFloat(data[0].lat), parseFloat(data[0].lon), city);
+          } else {
+            callback(37.5665, 126.9780, "Seoul");
+          }
         })
-        .catch(function(err) {
-          document.getElementById("weather").innerHTML = "날씨 정보를 가져올 수 없습니다.";
+        .catch(err => {
           console.error(err);
+          callback(37.5665, 126.9780, "Seoul");
         });
     }
 
-  function setTheme(value) {
-    document.body.className = value === 'none' ? '' : value;
-    localStorage.setItem("테마", document.body.className);
-
-    // 레트로 테마(=window) 선택 시 98.css 동적 로드
-    let retroLink = document.getElementById("retro-css");
-    if (value === "window") {
-      if (!retroLink) {
-        retroLink = document.createElement("link");
-        retroLink.id = "retro-css";
-        retroLink.rel = "stylesheet";
-        retroLink.href = "https://unpkg.com/98.css";
-        document.head.appendChild(retroLink);
-      }
-    } else {
-      if (retroLink) retroLink.remove();
+    function weatherCodeToText(code) {
+      if (code === 0) return "맑음";
+      if ([1, 2, 3].includes(code)) return "구름 조금/흐림";
+      if ([45, 48].includes(code)) return "안개";
+      if ([51, 53, 55].includes(code)) return "이슬비";
+      if ([61, 63, 65].includes(code)) return "비";
+      if ([71, 73, 75].includes(code)) return "눈";
+      if ([80, 81, 82].includes(code)) return "소나기";
+      if ([95, 96, 99].includes(code)) return "뇌우";
+      return "알 수 없음";
     }
-  }
+
+    function fetchWeather(lat, lon, city) {
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
+        .then(res => res.json())
+        .then(data => {
+          const weather = data.current_weather;
+          const statusText = weatherCodeToText(weather.weathercode);
+          if (city == "Unknown") {
+            document.getElementById("weather").innerHTML = `현재위치 날씨: ${statusText}, 온도: ${weather.temperature}°C, 풍속: ${weather.windspeed} km/h`
+          }
+          else if (city != "Unknown") {
+            document.getElementById("weather").innerHTML =
+              `${city} 날씨: ${statusText}, 온도: ${weather.temperature}°C, 풍속: ${weather.windspeed} km/h`;
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById("weather").innerHTML = "날씨 정보를 가져올 수 없습니다.";
+        });
+    }
+
+    function setTheme(value) {
+      document.body.className = value === 'none' ? '' : value;
+      localStorage.setItem("테마", document.body.className);
+
+      let retroLink = document.getElementById("retro-css");
+      if (value === "window") {
+        if (!retroLink) {
+          retroLink = document.createElement("link");
+          retroLink.id = "retro-css";
+          retroLink.rel = "stylesheet";
+          retroLink.href = "https://unpkg.com/98.css";
+          document.head.appendChild(retroLink);
+        }
+      } else {
+        if (retroLink) retroLink.remove();
+      }
+    }
 
     setTime(language);
-    setInterval(function() {
+    setInterval(function () {
       setTime(language);
     }, 1000)
     getWeather()
@@ -625,13 +664,13 @@
     document.body.className = savedTheme === "none" ? "" : savedTheme;
     document.getElementById('theme-select').value = savedTheme;
 
-      if (savedTheme === "window") {
-    const retroLink = document.createElement("link");
-    retroLink.id = "retro-css";
-    retroLink.rel = "stylesheet";
-    retroLink.href = "https://unpkg.com/98.css";
-    document.head.appendChild(retroLink);
-  }
+    if (savedTheme === "window") {
+      const retroLink = document.createElement("link");
+      retroLink.id = "retro-css";
+      retroLink.rel = "stylesheet";
+      retroLink.href = "https://unpkg.com/98.css";
+      document.head.appendChild(retroLink);
+    }
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/service-worker.js')
         .then(() => console.log('Service Worker 등록 성공'))
