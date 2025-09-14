@@ -254,6 +254,11 @@
       background-color: #00b899 !important;
     }
 
+    #specialLogo {
+      width: 85%;
+      height: auto;
+    }
+
     @media (max-width:480px) {
       .engine {
         text-align: center;
@@ -300,6 +305,9 @@
       <button style="width:130px; height:45px; background-color:gray; border-radius:5px;">
         <a href="https://bamtolcompany.github.io/allinoneshopping/" style="font-size:20px;">올인원 쇼핑</a>
       </button>
+    </div>
+    <div>
+      <img id="specialLogo">
     </div>
 
     <div style="display: flex; gap:5px;">
@@ -505,27 +513,27 @@
       }
       else if (e.key === 'Enter' && inputBox.value.startsWith('@naver')) {
         inputBox.value = inputBox.value.replace(/^@naver\s*/, '');
-        search('naver');        
+        search('naver');
       }
       else if (e.key === 'Enter' && inputBox.value.startsWith('@daum')) {
         inputBox.value = inputBox.value.replace(/^@daum\s*/, '');
-        search('daum');        
+        search('daum');
       }
       else if (e.key === 'Enter' && inputBox.value.startsWith('@yahoo')) {
         inputBox.value = inputBox.value.replace(/^@yahoo\s*/, '');
-        search('yahoo');        
+        search('yahoo');
       }
       else if (e.key === 'Enter' && inputBox.value.startsWith('@youtube')) {
         inputBox.value = inputBox.value.replace(/^@youtube\s*/, '');
-        search('youtube');        
+        search('youtube');
       }
       else if (e.key === 'Enter' && inputBox.value.startsWith('@bing')) {
         inputBox.value = inputBox.value.replace(/^@bing\s*/, '');
-        search('bing');        
+        search('bing');
       }
       else if (e.key === 'Enter' && inputBox.value.startsWith('@ai')) {
         inputBox.value = inputBox.value.replace(/^@ai\s*/, '');
-        search('ai');        
+        search('ai');
       }
       else if (e.key === 'Enter') {
         const engine = localStorage.getItem("recentSearchEngine");
@@ -704,6 +712,18 @@
         .then(() => console.log('Service Worker 등록 성공'))
         .catch(() => console.log('Service Worker 등록 실패'));
     }
+    function logo() {
+      var specialLogo = document.getElementById("specialLogo");
+      const date = new Date();
+      var formatted = new Intl.DateTimeFormat("en-US", {
+        month: "numeric",
+        day: "numeric"
+      }).format(date);
+      if (formatted == "10/6") {
+        specialLogo.src = "추석.png";
+      }
+    }
+    logo();
   </script>
   <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
   <script type="text/javascript">
