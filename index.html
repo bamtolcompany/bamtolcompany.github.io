@@ -40,6 +40,8 @@
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1AC8FF">
   <meta name="yandex-verification" content="96c9424419bd925a" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=location_searching" />
   <style>
     .white {
       background-color: white;
@@ -259,6 +261,28 @@
       height: auto;
     }
 
+    .search-location {
+      width: auto;
+      height: auto;
+      padding: 0px;
+      background-color: #ccc;
+      font-size: 0px;
+      cursor: pointer;
+    }
+
+    .material-symbols-outlined {
+      margin: 0;
+    }
+
+    .weather {
+      width: auto;
+      height: 20px;
+    }
+
+    .container {
+      display: flex;
+    }
+
     @media (max-width:480px) {
       .engine {
         text-align: center;
@@ -297,7 +321,13 @@
       <a href="https://copilot.microsoft.com/"><img src="https://copilot.microsoft.com/favicon.ico"></a>
     </div>
     <div id="time" class="time"></div>
-    <div id="weather" class="weather"></div>
+
+    <div class="container">
+      <div id="weather" class="weather"></div><button onclick="getWeather()" class="search-location"><span
+          class="material-symbols-outlined">
+          location_searching
+        </span></button>
+    </div>
     <div class="about-sites">
       <button style="width:130px; height:45px; background-color:gray; border-radius:5px;">
         <a href="https://bamtolcompany.github.io/allinonenews/" style="font-size:20px;">올인원 뉴스</a>
@@ -367,7 +397,8 @@
     <a href="https://bamtolcompany.github.io/products" class="footer-link">밤톨 서비스</a>
     <a href="https://bamtolcompany.github.io/support" class="footer-link">도움말</a>
     <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZXzol5qk6zGwrMvAco9f3M1QumJ6W2ut0g7egWFUfzHB5ig/viewform?usp=header"
-      class="footer-link">피드백 및 버그 신고</a>
+      class="footer-link">피드백 및 버그 신고</a><br>
+      <a href="https://github.com/bamtolcompany" class="footer-link">Github</a>
     <p>&copy; 2025 bamtol company. All rights reserved.</p>
   </footer>
   <script>
@@ -665,6 +696,9 @@
             document.getElementById("weather").innerHTML =
               `${city} 날씨: ${statusText}, 온도: ${weather.temperature}°C, 풍속: ${weather.windspeed} km/h`;
           }
+          if (city == "Seoul") {
+            document.getElementById("weather").innerHTML = `서울특별시 날씨: ${statusText}, 온도: ${weather.temperature}°C, 풍속: ${weather.windspeed} km/h`
+          }
         })
         .catch(err => {
           console.error(err);
@@ -694,7 +728,7 @@
     setInterval(function () {
       setTime(language);
     }, 1000)
-    getWeather()
+    getWeather("서울 특별시")
 
     const savedTheme = localStorage.getItem("테마") || "none";
     document.body.className = savedTheme === "none" ? "" : savedTheme;
