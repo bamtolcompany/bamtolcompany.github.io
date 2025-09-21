@@ -282,6 +282,25 @@
     .container {
       display: flex;
     }
+    .engine button {
+      cursor: pointer;
+    }
+    .category {
+      cursor: pointer;
+    }
+    .engine button:hover {
+      transform: scale(1.05);
+      background-color: #ffeb36;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      border-color: #ffeb36;
+    }
+    .category:hover {
+      transform: scale(1.05);
+      background-color: #ffff80;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      border-image-slice: 1;
+      border-image-source: linear-gradient(45deg, #ffbb01, #e5ff00);
+    }
 
     @media (max-width:480px) {
       .engine {
