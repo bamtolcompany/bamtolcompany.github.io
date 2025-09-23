@@ -164,6 +164,7 @@
       height: 40px !important;
       font-size: 100%;
       border-radius: 30px;
+      padding: 15px;
     }
 
     .ai img {
@@ -341,6 +342,14 @@
     .dark {
       background: linear-gradient(25deg, black, rgb(19, 19, 19), rgb(36, 36, 36),  rgb(14, 14, 14), rgb(24, 24, 24));
     }
+    .dark #query {
+      background-color: #3b3b3b;
+      color: white;
+      border: 1px gray solid;
+    }
+    .dark #query::placeholder {
+      color: #dfdfdf;
+    }
     @media (max-width:480px) {
       .engine {
         text-align: center;
@@ -465,6 +474,9 @@
     const AUTOCOMPLETE_API_URL = "https://backend-bzep.onrender.com/api/autocomplete";
     const TOP_QUERIES_API_URL = "https://backend-bzep.onrender.com/api/top-queries";
     var language = navigator.language;
+    function mobile() {
+      return window.innerWidth <= 480;
+    }
 
     function saveQuery(query) {
       if (!query) return;
@@ -501,7 +513,12 @@
         case 'blog': url = `https://search.naver.com/search.naver?ssc=tab.blog.all&sm=tab_jum&query=${encodeURIComponent(query)}`; break;
         case 'naverKnowledgeIn': url = `https://search.naver.com/search.naver?ssc=tab.kin.kqna&where=kin&sm=tab_jum&query=${encodeURIComponent(query)}`; break;
       }
-      window.open(url, '_blank');
+      if (mobile()) {
+        window.location.href = url;
+      }
+      else {
+        window.open(url, '_blank');
+      }
       localStorage.setItem("recentSearchEngine", engine);
     }
 
