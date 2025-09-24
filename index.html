@@ -280,76 +280,97 @@
     .container {
       display: flex;
     }
+
     .engine button {
       cursor: pointer;
     }
+
     .category {
       cursor: pointer;
     }
+
     .engine button:hover {
       transform: scale(1.05);
       background-color: #ffeb36;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
       border-color: #ffeb36;
     }
+
     .category:hover {
       transform: scale(1.05);
       background-color: #ffff80;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
       border-image-slice: 1;
       border-image-source: linear-gradient(45deg, #ffbb01, #e5ff00);
     }
+
     .white .engine button:hover {
       background-color: #ffff80;
     }
+
     .dark .engine button:hover {
       background-color: rgb(90, 90, 90);
       border-color: rgb(90, 90, 90);
     }
+
     .dark .category:hover {
       background-color: rgb(90, 90, 90);
       border-image-slice: 1;
       border-image-source: linear-gradient(0deg, #141414, #dadada);
     }
+
     .dark footer p {
       color: black;
     }
-    .dark .time, .dark .weather {
+
+    .dark .time,
+    .dark .weather {
       color: white;
     }
+
     .dark aside p {
       color: white;
     }
+
     .window .engine button:hover {
       background-color: silver;
     }
+
     .dark .top {
       color: white;
       background-color: #333333;
     }
+
     .dark .list:hover {
       color: #e0e0e0;
     }
+
     .dark .footer-link {
       color: white;
     }
+
     .dark footer {
       background-color: rgb(26, 26, 26);
     }
+
     .dark footer p {
       color: white;
     }
+
     .dark {
-      background: linear-gradient(25deg, black, rgb(19, 19, 19), rgb(36, 36, 36),  rgb(14, 14, 14), rgb(24, 24, 24));
+      background: linear-gradient(25deg, black, rgb(19, 19, 19), rgb(36, 36, 36), rgb(14, 14, 14), rgb(24, 24, 24));
     }
+
     .dark #query {
       background-color: #3b3b3b;
       color: white;
       border: 1px gray solid;
     }
+
     .dark #query::placeholder {
       color: #dfdfdf;
     }
+
     @media (max-width:480px) {
       .engine {
         text-align: center;
@@ -465,8 +486,9 @@
     <a href="https://bamtolcompany.github.io/support" class="footer-link">도움말</a>
     <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZXzol5qk6zGwrMvAco9f3M1QumJ6W2ut0g7egWFUfzHB5ig/viewform?usp=header"
       class="footer-link">피드백 및 버그 신고</a><br>
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdun2upPol4YSjcY2OGairYRypiSV1_eKhFwEYOsVDYar-xrw/viewform?usp=header" class="footer-link">인기 검색어 신고</a>
-      <a href="secret.html" class="footer-link">시크릿 모드로 전환</a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdun2upPol4YSjcY2OGairYRypiSV1_eKhFwEYOsVDYar-xrw/viewform?usp=header"
+      class="footer-link">인기 검색어 신고</a>
+    <a href="secret.html" class="footer-link">시크릿 모드로 전환</a>
     <p>&copy; 2025 bamtol company. All rights reserved.</p>
   </footer>
   <script>
@@ -692,7 +714,27 @@
         second: "2-digit",
         hour12: false
       };
-      time.innerHTML = Intl.DateTimeFormat(lang, options).format(new Date());
+      var today = new Date();
+      var month = today.getMonth() + 1;
+      var day = today.getDate();
+      if (month === 3 && day === 1) {
+        time.innerHTML = Intl.DateTimeFormat(lang, options).format(new Date()) + "/ 3.1절";
+      }
+      else if (month === 7 && day === 17) {
+        time.innerHTML = Intl.DateTimeFormat(lang, options).format(new Date()) + "/ 제헌절";
+      }
+      else if (month === 8 && day === 15) {
+        time.innerHTML = Intl.DateTimeFormat(lang, options).format(new Date()) + "/ 광복절";
+      }
+      else if (month === 10 && day === 3) {
+        time.innerHTML = Intl.DateTimeFormat(lang, options).format(new Date()) + "/ 개천절";
+      }
+      else if (month === 10 && day === 9) {
+        time.innerHTML = Intl.DateTimeFormat(lang, options).format(new Date()) + "/ 한글날";
+      }
+      else {
+        time.innerHTML = Intl.DateTimeFormat(lang, options).format(new Date());
+      }
     }
     function getWeather(location) {
       if (!location) {
