@@ -28,20 +28,38 @@
         </p>
     </div>
 <input type="text" id="comment">
-<button id="saveBtn">저장하기</button>
+<button id="saveBtn">댓글 보내기</button>
+<button onclick="list.scrollTop = list.scrollHeight;">최신 댓글 보기</button>
+
+<div id="comments"></div>
 
 <script>
   var comment = document.getElementById("comment");
-  var btn = document.getElementById('saveBtn');
+  var btn = document.getElementById("saveBtn");
+  var commentsDiv = document.getElementById("comments");
 
-  btn.addEventListener('click', function() {
+  btn.addEventListener("click", function() {
     var message = comment.value;
-    fetch('https://backend-bzep.onrender.com/api/edit-comment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch("https://backend-bzep.onrender.com/api/edit-comment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: message })
+    }).then(function() {
+      comment.value = "";
+      loadComments();
     });
   });
+
+  function loadComments() {
+    fetch("https://backend-bzep.onrender.com/api/view-comment")
+      .then(function(res) { return res.text(); })
+      .then(function(html) {
+        commentsDiv.innerHTML = html;
+      });
+  }
+
+  loadComments();
 </script>
+
 </body>
 </html>
