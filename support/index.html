@@ -27,5 +27,21 @@
             앞으로도 더 나은 서비스와 업데이트로 찾아뵙겠습니다. 감사합니다.
         </p>
     </div>
+<input type="text" id="comment">
+<button id="saveBtn">저장하기</button>
+
+<script>
+  var comment = document.getElementById("comment");
+  var btn = document.getElementById('saveBtn');
+
+  btn.addEventListener('click', function() {
+    var message = comment.value;
+    fetch('https://backend-bzep.onrender.com/api/edit-comment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: message })
+    });
+  });
+</script>
 </body>
 </html>
