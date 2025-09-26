@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>게시판</title>
+<style>
+body { font-family: Arial; padding: 20px; }
+.post { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<h1>게시판 목록</h1>
+<div id="posts"></div>
+<button onclick="window.location.href='create.html'">새 글쓰기</button>
+
+<script>
+const API_BASE = "https://community-xabl.onrender.com";
+
+async function fetchPosts() {
+  const res = await fetch(`${API_BASE}/posts`);
+  const posts = await res.json();
+  const div = document.getElementById("posts");
+  div.innerHTML = "";
+  posts.forEach(p => {
+    const postDiv = document.createElement("div");
+    postDiv.className = "post";
+    postDiv.innerHTML = `<h3>${p.title}</h3><p>${p.content}</p><small>조회수: ${p.views}</small>`;
+    div.appendChild(postDiv);
+  });
+}
+
+fetchPosts();
+</script>
+
+</body>
+</html>
