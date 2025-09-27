@@ -490,7 +490,8 @@
     <a href="https://docs.google.com/forms/d/e/1FAIpQLSdun2upPol4YSjcY2OGairYRypiSV1_eKhFwEYOsVDYar-xrw/viewform?usp=header"
       class="footer-link">인기 검색어 신고</a>
     <a href="secret.html" class="footer-link">시크릿 모드로 전환</a>
-    <p>&copy; 2025 bamtol company. All rights reserved. | <a href="mailto:bamtol_official@naver.com" class="footer-link">이메일</a></p>
+    <p>&copy; 2025 bamtol company. All rights reserved. | <a href="mailto:bamtol_official@naver.com"
+        class="footer-link">이메일</a></p>
   </footer>
   <script>
     const SAVE_API_URL = "https://backend-bzep.onrender.com/api/save-query";
@@ -513,6 +514,19 @@
         .then(data => console.log("Query saved:", data))
         .catch(err => console.error("저장 실패:", err));
     }
+    let f8Pressed = false;
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "F8") {
+        f8Pressed = true;
+      }
+    });
+
+    document.addEventListener("keyup", function (event) {
+      if (event.key === "F8") {
+        f8Pressed = false;
+      }
+    });
 
     function search(engine) {
       const input = document.getElementById('query');
@@ -540,7 +554,13 @@
         window.location.href = url;
       }
       else {
-        window.open(url, '_blank');
+        if (f8Pressed) {
+          window.open(url, '_blank', 'width=600,height=400');
+
+        }
+        else {
+          window.open(url, '_blank');
+        }
       }
       localStorage.setItem("recentSearchEngine", engine);
     }
