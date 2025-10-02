@@ -27,45 +27,5 @@
             앞으로도 더 나은 서비스와 업데이트로 찾아뵙겠습니다. 감사합니다.
         </p>
     </div>
-    <div>
-      <h2>댓글 쓸때 주의할 점</h2>
-      <p>
-        1, 댓글은 사용자가 삭제, 수정이 불가능하니 댓글을 작성할때는 신중하게 써주세요. 이후에 삭제 및 수정을 요구할수 있습니다.<br>
-        2, 욕설, 상대를 비방하는 댓글, 도움말 작성과 관련이 없는 댓글은 통보없이 운영자가 삭제할수 있습니다. (현재 댓글에 html코드를 적으면 해당코드가 실행되는데 이를 악용할경우에도 삭제하겠습니다.)<br>
-      </p>
-    </div>
-<input type="text" id="comment">
-<button id="saveBtn">댓글 보내기</button>
-
-<div id="comments"></div>
-
-<script>
-  var comment = document.getElementById("comment");
-  var btn = document.getElementById("saveBtn");
-  var commentsDiv = document.getElementById("comments");
-
-  btn.addEventListener("click", function() {
-    var message = comment.value;
-    fetch("https://backend-bzep.onrender.com/api/edit-comment", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: message })
-    }).then(function() {
-      comment.value = "";
-      loadComments();
-    });
-  });
-
-  function loadComments() {
-    fetch("https://backend-bzep.onrender.com/api/view-comment")
-      .then(function(res) { return res.text(); })
-      .then(function(html) {
-        commentsDiv.innerHTML = html;
-      });
-  }
-
-  loadComments();
-</script>
-
 </body>
 </html>
