@@ -8,7 +8,9 @@ const urlsToCache = [
   '/service-worker.js',
   '/ads.txt',
   '/robots.txt',
-  '/404.html'
+  '/404.html',
+  '/bamtol-game/index.html',
+  '/bamtol-game/bamtol.png'
 ];
 
 // 설치: 캐시 저장
