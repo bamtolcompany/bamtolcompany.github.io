@@ -19,6 +19,7 @@
 
     gtag('config', 'G-WVPNVFM075');
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <meta name="naver-site-verification" content="c0d0278354abb9332eeab54d415d9f01f3ecea62" />
   <meta name="google-site-verification" content="UhQkqPlA225MzqsxScvcuS6697b9sBfc8qAiIgFj0X0" />
   <meta name="naver-site-verification" content="04815f3e125ccbf570511b852976b17b4eed0bce" />
@@ -148,6 +149,7 @@
     h6 {
       color: white;
     }
+
     .ignore {
       color: blue;
     }
@@ -320,6 +322,7 @@
       border-image-slice: 1;
       border-image-source: linear-gradient(45deg, #ffbb01, #e5ff00);
     }
+
     footer p {
       font-family: 'NanumGothicBold';
     }
@@ -390,6 +393,7 @@
     .dark #query::placeholder {
       color: #dfdfdf;
     }
+
     .about-sites a {
       background-color: #9e9e9e;
       padding: 10px;
@@ -397,6 +401,7 @@
       margin: 10px;
       border: 2px solid;
     }
+
     .about-sites a:hover {
       background-color: #8a8a8a;
       text-decoration: underline;
@@ -448,8 +453,8 @@
         </span></button>
     </div>
     <div class="about-sites">
-        <a href="https://bamtolcompany.github.io/allinonenews/" style="font-size:20px;">올인원 뉴스</a>
-        <a href="https://bamtolcompany.github.io/allinoneshopping/" style="font-size:20px;">올인원 쇼핑</a>
+      <a href="https://bamtolcompany.github.io/allinonenews/" style="font-size:20px;">올인원 뉴스</a>
+      <a href="https://bamtolcompany.github.io/allinoneshopping/" style="font-size:20px;">올인원 쇼핑</a>
     </div>
     <div>
       <img id="specialLogo">
@@ -557,7 +562,16 @@
     function search(engine) {
       const input = document.getElementById('query');
       const query = input.value.trim();
-      if (!query) { alert("검색어를 입력하세요"); return; }
+      if (!query) {
+        Swal.fire({
+          title: '검색어를 입력해주세요',
+          icon: 'warning',
+          confirmButtonText: '확인',
+          confirmButtonColor: 'orange',
+          scrollbarPadding: false,
+          allowEnterKey: false
+        }); return;
+      }
 
       saveQuery(query);
 
@@ -715,7 +729,14 @@
       else if (e.key === 'Enter') {
         const engine = localStorage.getItem("recentSearchEngine");
         if (engine == null) {
-          alert("최근에 사용한 검색엔진이 없습니다");
+          Swal.fire({
+            title: '최근에 사용한 검색엔진이 없습니다',
+            icon: 'error',
+            confirmButtonText: '확인',
+            confirmButtonColor: 'red',
+            scrollbarPadding: false,
+            allowEnterKey: false
+          });
           return;
         }
         search(engine);
@@ -735,7 +756,22 @@
 
     function startVoiceRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) { alert("이 브라우저는 음성 인식을 지원하지 않아요. 크롬을 사용해주세요."); return; }
+      if (!SpeechRecognition) {
+        Swal.fire({
+          title: '이 브라우저는 음성인식을 지원하지 않아요. 크롬을 사용해주세요.',
+          icon: 'error',
+          confirmButtonText: '확인',
+          confirmButtonColor: 'red',
+          cancelButtonText: "취소",
+          showCancelButton: true,
+          scrollbarPadding: false,
+          allowEnterKey: false
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = "https://www.google.com/intl/ko_kr/chrome/";
+          }
+        }); return;
+      }
 
       const recognition = new SpeechRecognition();
       recognition.lang = language;
@@ -748,7 +784,14 @@
       };
 
       recognition.onerror = function (event) {
-        alert("음성 인식 오류: " + event.error);
+        Swal.fire({
+            title: '음성 인식 오류: ' + event.error,
+            icon: 'error',
+            confirmButtonText: '확인',
+            confirmButtonColor: 'red',
+            scrollbarPadding: false,
+            allowEnterKey: false
+          });
       };
     }
     function setTime(lang) {
