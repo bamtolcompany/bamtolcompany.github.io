@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <title>게임 등록 - 밤톨 게임즈</title>
@@ -7,42 +8,90 @@
   <link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-gothic.css" rel="stylesheet">
   <style>
     * {
-      font-family: 'NanumGothic'!important;
+      font-family: 'NanumGothic' !important;
     }
+
     :root {
       --primary-color: rgb(4, 121, 0);
       --bg-color: #f9fff9;
       --input-bg: #fff;
-      --shadow: rgba(0,0,0,0.1);
+      --shadow: rgba(0, 0, 0, 0.1);
       --radius: 10px;
     }
 
     body {
-      margin: 0; padding: 40px 20px; background-color: var(--bg-color);
-      font-family:'Segoe UI',sans-serif; display:flex; justify-content:center;
+      margin: 0;
+      padding: 40px 20px;
+      background-color: var(--bg-color);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
     }
 
     form {
-      width:100%; max-width:500px; background-color: var(--input-bg);
-      padding:30px; border-radius: var(--radius); box-shadow:0 6px 15px var(--shadow);
-      display:flex; flex-direction:column; gap:15px;
+      width: 100%;
+      max-width: 500px;
+      background-color: var(--input-bg);
+      padding: 30px;
+      border-radius: var(--radius);
+      box-shadow: 0 6px 15px var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
 
-    h1 { text-align:center; color: var(--primary-color); margin-bottom:20px; }
-    input, textarea { padding:10px; border-radius: var(--radius); border:1px solid #ccc; font-size:16px; width:100%; }
-    textarea { min-height:100px; resize:vertical; }
-    .button { padding:10px 0; border:none; border-radius:var(--radius); background-color:var(--primary-color); color:white; font-weight:bold; cursor:pointer; transition:0.2s; }
-    .button:hover { background-color: rgb(0,90,0);}
-    #message { text-align:center; color: var(--primary-color); font-weight:bold; }
+    h1 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+    }
+
+    input,
+    textarea {
+      padding: 10px;
+      border-radius: var(--radius);
+      border: 1px solid #ccc;
+      font-size: 16px;
+      width: 100%;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .button {
+      padding: 10px 0;
+      border: none;
+      border-radius: var(--radius);
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .button:hover {
+      background-color: rgb(0, 90, 0);
+    }
+
+    #message {
+      text-align: center;
+      color: var(--primary-color);
+      font-weight: bold;
+    }
   </style>
 </head>
+
 <body>
   <form id="gameForm">
     <h1>게임 등록</h1>
-    <input type="email" name="email" placeholder="이메일" required>
+    <input type="email" name="email" placeholder="이메일" id="email" required>
     <input type="text" name="title" placeholder="게임 제목" required>
     <textarea name="description" placeholder="게임 설명" required></textarea>
     <input type="url" name="url" placeholder="게임 URL" required>
+    <p>아래의 텍스트를 head태그에 붙여넣어 소유권을 인증하십시오.</p>
+    <p id="metaTag"></p>
     <button type="submit" class="button">등록</button>
     <p id="message"></p>
   </form>
@@ -50,6 +99,12 @@
   <script>
     const form = document.getElementById('gameForm');
     const msg = document.getElementById('message');
+    const metaTag = document.getElementById('metaTag');
+    const email = document.getElementById('email');
+
+    setInterval(() => {
+      metaTag.innerText = `<meta name="bamtol-games-email" content="${email.value}">`
+    }, 1000);
 
     form.addEventListener('submit', async e => {
       e.preventDefault();
@@ -57,18 +112,19 @@
 
       try {
         const res = await fetch('https://backend-bzep.onrender.com/api/edit-games', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
         const result = await res.json();
-        if(!res.ok) throw new Error(result.message);
-        msg.textContent='등록 완료! 메인페이지로 이동합니다.';
-        setTimeout(()=>location.href='index.html',1500);
-      } catch(err) {
-        msg.textContent=`오류: ${err.message}`;
+        if (!res.ok) throw new Error(result.message);
+        msg.textContent = '등록 완료! 메인페이지로 이동합니다.';
+        setTimeout(() => location.href = 'index.html', 1500);
+      } catch (err) {
+        msg.textContent = `오류: ${err.message}`;
       }
     });
   </script>
 </body>
+
 </html>
