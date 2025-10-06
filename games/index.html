@@ -35,7 +35,6 @@
     </ul>
   </div>
 
-  <!-- 상세 페이지 -->
   <div id="detail"></div>
 
   <script>
@@ -45,11 +44,13 @@
     const detailDiv = document.getElementById("detail");
 
     if(gameId){
-      // 상세페이지 모드
       mainPage.style.display='none';
       detailDiv.style.display='block';
       fetch(`https://backend-bzep.onrender.com/api/game/${gameId}`)
-        .then(res=>{ if(!res.ok) throw new Error("게임을 찾을 수 없습니다."); return res.json();})
+        .then(res=>{ 
+          if(!res.ok) throw new Error("게임을 찾을 수 없습니다."); 
+          return res.json();
+        })
         .then(g=>{
           document.title = `밤톨 게임즈 - ${g.title}`;
           detailDiv.innerHTML = `
@@ -60,10 +61,12 @@
             <button onclick="location.href='index.html'" class="button" style="margin-top:15px;">← 목록으로</button>
           `;
         })
-        .catch(err=>{ detailDiv.innerHTML="<h2>존재하지 않는 게임입니다.</h2>"; console.error(err); });
+        .catch(err=>{
+          detailDiv.innerHTML="<h2>존재하지 않는 게임입니다.</h2>"; 
+          console.error(err); 
+        });
 
     } else {
-      // 메인페이지 모드
       detailDiv.style.display='none';
       fetch('https://backend-bzep.onrender.com/api/games')
         .then(res=>res.json())
@@ -72,12 +75,14 @@
           ul.innerHTML='';
           games.forEach(g=>{
             const li=document.createElement('li');
-            li.innerHTML=`<a href="index.html?id=${g._id}">${g.title}</a>
+            li.innerHTML=`<a href="index.html?id=${g.id}">${g.title}</a>
                           <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>`;
             ul.appendChild(li);
           });
         })
-        .catch(()=>{ document.getElementById('gamesList').textContent="게임 목록을 불러올 수 없습니다." });
+        .catch(()=>{
+          document.getElementById('gamesList').textContent="게임 목록을 불러올 수 없습니다.";
+        });
     }
   </script>
 </body>
