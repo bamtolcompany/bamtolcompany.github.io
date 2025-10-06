@@ -1,35 +1,120 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
-  <title>밤톨 게임즈</title>
+  <title>밤톨 게임즈 | 게임을 공유하고 플레이 하세요!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-gothic.css" rel="stylesheet">
   <style>
+    * {
+      font-family: 'NanumGothic';
+    }
     :root {
       --primary-color: rgb(4, 121, 0);
       --bg-color: #f0f4f0;
       --card-bg: #fff;
-      --shadow: rgba(0,0,0,0.15);
+      --shadow: rgba(0, 0, 0, 0.15);
       --radius: 15px;
     }
 
-    body { margin:0; padding:20px; font-family:'Segoe UI',sans-serif; background:var(--bg-color);}
-    a { text-decoration:none; color:var(--primary-color);}
-    .button { background: var(--primary-color); color:white; border:none; padding:10px 20px; border-radius: var(--radius); cursor:pointer; transition:0.2s;}
-    .button:hover { background: rgb(0,90,0);}
-    h1,h2 { color: var(--primary-color);}
-    #gamesList { display:grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap:20px; list-style:none; padding:0; margin-top:20px;}
-    #gamesList li { background: var(--card-bg); padding:20px; border-radius: var(--radius); box-shadow:0 6px 12px var(--shadow); transition:0.2s;}
-    #gamesList li:hover { transform: translateY(-5px);}
-    #detail { display:none; margin-top:40px; background: var(--card-bg); padding:20px; border-radius: var(--radius); box-shadow:0 6px 12px var(--shadow);}
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--bg-color);
+    }
+
+    a {
+      text-decoration: none;
+      color: var(--primary-color);
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .button:hover {
+      background: rgb(0, 90, 0);
+    }
+
+    h1,
+    h2 {
+      color: var(--primary-color);
+    }
+
+    #gamesList {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    #gamesList li {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: var(--radius);
+      box-shadow: 0 6px 12px var(--shadow);
+      transition: 0.2s;
+    }
+
+    #gamesList li:hover {
+      transform: translateY(-5px);
+    }
+
+    #detail {
+      display: none;
+      margin-top: 40px;
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: var(--radius);
+      box-shadow: 0 6px 12px var(--shadow);
+    }
+
+    #recentGameList {
+      display: flex;
+      gap: 20px;
+      padding: 0;
+      list-style: none;
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+
+    #recentGameList li {
+      background: var(--card-bg);
+      padding: 15px;
+      border-radius: var(--radius);
+      box-shadow: 0 6px 12px var(--shadow);
+      flex: 0 0 200px;
+      transition: 0.2s;
+    }
+
+    #recentGameList li:hover {
+      transform: translateY(-5px);
+    }
   </style>
 </head>
+
 <body>
 
-  <!-- 메인 페이지 -->
   <div id="mainPage">
     <h1>밤톨 게임즈</h1>
     <a href="add.html" class="button">게임 등록하기</a>
-    <h2>게임 목록 (조회수 순)</h2>
+    <h2>최신 게임</h2>
+    <ul id="recentGameList">
+      <li>불러오는 중...</li>
+    </ul>
+    <h2>게임 목록</h2>
     <ul id="gamesList">
       <li>불러오는 중...</li>
     </ul>
@@ -43,15 +128,15 @@
     const mainPage = document.getElementById("mainPage");
     const detailDiv = document.getElementById("detail");
 
-    if(gameId){
-      mainPage.style.display='none';
-      detailDiv.style.display='block';
+    if (gameId) {
+      mainPage.style.display = 'none';
+      detailDiv.style.display = 'block';
       fetch(`https://backend-bzep.onrender.com/api/game/${gameId}`)
-        .then(res=>{ 
-          if(!res.ok) throw new Error("게임을 찾을 수 없습니다."); 
+        .then(res => {
+          if (!res.ok) throw new Error("게임을 찾을 수 없습니다.");
           return res.json();
         })
-        .then(g=>{
+        .then(g => {
           document.title = `밤톨 게임즈 - ${g.title}`;
           detailDiv.innerHTML = `
             <h2 style="color: var(--primary-color); margin-bottom:10px;">${g.title}</h2>
@@ -61,29 +146,48 @@
             <button onclick="location.href='index.html'" class="button" style="margin-top:15px;">← 목록으로</button>
           `;
         })
-        .catch(err=>{
-          detailDiv.innerHTML="<h2>존재하지 않는 게임입니다.</h2>"; 
-          console.error(err); 
+        .catch(err => {
+          detailDiv.innerHTML = "<h2>존재하지 않는 게임입니다.</h2>";
+          console.error(err);
         });
 
     } else {
-      detailDiv.style.display='none';
+      detailDiv.style.display = 'none';
       fetch('https://backend-bzep.onrender.com/api/games')
-        .then(res=>res.json())
-        .then(games=>{
-          const ul=document.getElementById('gamesList');
-          ul.innerHTML='';
-          games.forEach(g=>{
-            const li=document.createElement('li');
-            li.innerHTML=`<a href="index.html?id=${g.id}">${g.title}</a>
+        .then(res => res.json())
+        .then(games => {
+          const ul = document.getElementById('gamesList');
+          ul.innerHTML = '';
+          games.forEach(g => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="index.html?id=${g.id}">${g.title}</a>
                           <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>`;
             ul.appendChild(li);
           });
         })
-        .catch(()=>{
-          document.getElementById('gamesList').textContent="게임 목록을 불러올 수 없습니다.";
+        .catch(() => {
+          document.getElementById('gamesList').textContent = "게임 목록을 불러올 수 없습니다.";
         });
     }
+      fetch('https://backend-bzep.onrender.com/api/games')
+    .then(res => res.json())
+    .then(games => {
+      // ID 내림차순 정렬 후 최신 5개
+      const latestGames = games.sort((a,b)=>b.id - a.id).slice(0,5);
+
+      const ul = document.getElementById('recentGameList');
+      ul.innerHTML = '';
+      latestGames.forEach(g => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="index.html?id=${g.id}">${g.title}</a>
+                        <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>`;
+        ul.appendChild(li);
+      });
+    })
+    .catch(() => {
+      document.getElementById('recentGameList').textContent = "최신 게임을 불러올 수 없습니다.";
+    });
   </script>
 </body>
+
 </html>
