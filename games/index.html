@@ -2,176 +2,82 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>밤톨 게임즈 | 게임을 공유하고 플레이하세요!</title>
+  <title>밤톨 게임즈</title>
   <style>
     :root {
       --primary-color: rgb(4, 121, 0);
       --bg-color: #f0f4f0;
-      --text-color: #1a1a1a;
-      --card-bg: #ffffff;
-      --shadow: rgba(0,0,0,0.1);
-      --radius: 12px;
+      --card-bg: #fff;
+      --shadow: rgba(0,0,0,0.15);
+      --radius: 15px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      padding: 20px;
-    }
-
-    h1 {
-      color: var(--primary-color);
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    a {
-      text-decoration: none;
-      color: var(--primary-color);
-    }
-
-    .button {
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    .button:hover {
-      background-color: rgb(0, 90, 0);
-    }
-
-    #gamesList {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      list-style: none;
-      margin-top: 20px;
-    }
-
-    #gamesList li {
-      background-color: var(--card-bg);
-      padding: 15px;
-      border-radius: var(--radius);
-      box-shadow: 0 4px 8px var(--shadow);
-      transition: transform 0.2s;
-    }
-    #gamesList li:hover {
-      transform: translateY(-5px);
-    }
-
-    #detail {
-      margin-top: 40px;
-      background-color: var(--card-bg);
-      padding: 20px;
-      border-radius: var(--radius);
-      box-shadow: 0 4px 12px var(--shadow);
-    }
-
-    #detail h2 {
-      color: var(--primary-color);
-      margin-bottom: 10px;
-    }
-
-    #detail a.button {
-      display: inline-block;
-      margin-top: 10px;
-    }
-
-    form {
-      max-width: 500px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    input, textarea {
-      padding: 10px;
-      border-radius: var(--radius);
-      border: 1px solid #ccc;
-      width: 100%;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-
-    #message {
-      text-align: center;
-      margin-top: 10px;
-      color: var(--primary-color);
-    }
+    body { margin:0; padding:20px; font-family:'Segoe UI',sans-serif; background:var(--bg-color);}
+    a { text-decoration:none; color:var(--primary-color);}
+    .button { background: var(--primary-color); color:white; border:none; padding:10px 20px; border-radius: var(--radius); cursor:pointer; transition:0.2s;}
+    .button:hover { background: rgb(0,90,0);}
+    h1,h2 { color: var(--primary-color);}
+    #gamesList { display:grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap:20px; list-style:none; padding:0; margin-top:20px;}
+    #gamesList li { background: var(--card-bg); padding:20px; border-radius: var(--radius); box-shadow:0 6px 12px var(--shadow); transition:0.2s;}
+    #gamesList li:hover { transform: translateY(-5px);}
+    #detail { display:none; margin-top:40px; background: var(--card-bg); padding:20px; border-radius: var(--radius); box-shadow:0 6px 12px var(--shadow);}
   </style>
 </head>
 <body>
-  <h1>밤톨 게임즈</h1>
-  <a href="add.html" class="button">게임 등록하기</a>
 
-  <h2>게임 목록</h2>
-  <ul id="gamesList">
-    <li>불러오는 중...</li>
-  </ul>
+  <!-- 메인 페이지 -->
+  <div id="mainPage">
+    <h1>밤톨 게임즈</h1>
+    <a href="add.html" class="button">게임 등록하기</a>
+    <h2>게임 목록 (조회수 순)</h2>
+    <ul id="gamesList">
+      <li>불러오는 중...</li>
+    </ul>
+  </div>
 
+  <!-- 상세 페이지 -->
   <div id="detail"></div>
 
   <script>
-    // 메인 게임 목록
-    fetch('https://backend-bzep.onrender.com/api/games')
-      .then(res => res.json())
-      .then(games => {
-        const ul = document.getElementById('gamesList');
-        ul.innerHTML = '';
-        games.forEach(g => {
-          const li = document.createElement('li');
-          const a = document.createElement('a');
-          a.href = `index.html?id=${g._id}`;
-          a.textContent = `${g.title} (조회수: ${g.views})`;
-          a.classList.add('button');
-          li.appendChild(a);
-          ul.appendChild(li);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById('gamesList').textContent = "게임 목록을 불러올 수 없습니다.";
-      });
-
-    // 상세페이지 렌더링
     const params = new URLSearchParams(location.search);
     const gameId = params.get("id");
+    const mainPage = document.getElementById("mainPage");
     const detailDiv = document.getElementById("detail");
 
-    if (gameId) {
+    if(gameId){
+      // 상세페이지 모드
+      mainPage.style.display='none';
+      detailDiv.style.display='block';
       fetch(`https://backend-bzep.onrender.com/api/game/${gameId}`)
-        .then(res => {
-          if (!res.ok) throw new Error("게임을 찾을 수 없습니다.");
-          return res.json();
-        })
-        .then(g => {
-          detailDiv.innerHTML = `
-            <h2>${g.title}</h2>
-            <p>${g.description}</p>
-            <a href="${g.url}" target="_blank" class="button">게임 하러가기</a>
-            <p>조회수: ${g.views}</p>
-            <button onclick="location.href='index.html'" class="button">← 목록으로</button>
-          `;
+        .then(res=>{ if(!res.ok) throw new Error("게임을 찾을 수 없습니다."); return res.json();})
+        .then(g=>{
           document.title = `밤톨 게임즈 - ${g.title}`;
+          detailDiv.innerHTML = `
+            <h2 style="color: var(--primary-color); margin-bottom:10px;">${g.title}</h2>
+            <p style="font-size:16px; line-height:1.5;">${g.description}</p>
+            <a href="${g.url}" target="_blank" class="button" style="margin-top:15px;">게임 하러가기</a>
+            <p style="margin-top:10px; color:#555;">조회수: ${g.views}</p>
+            <button onclick="location.href='index.html'" class="button" style="margin-top:15px;">← 목록으로</button>
+          `;
         })
-        .catch(err => {
-          detailDiv.innerHTML = "<h2>존재하지 않는 게임입니다.</h2>";
-          console.error(err);
-        });
+        .catch(err=>{ detailDiv.innerHTML="<h2>존재하지 않는 게임입니다.</h2>"; console.error(err); });
+
+    } else {
+      // 메인페이지 모드
+      detailDiv.style.display='none';
+      fetch('https://backend-bzep.onrender.com/api/games')
+        .then(res=>res.json())
+        .then(games=>{
+          const ul=document.getElementById('gamesList');
+          ul.innerHTML='';
+          games.forEach(g=>{
+            const li=document.createElement('li');
+            li.innerHTML=`<a href="index.html?id=${g._id}">${g.title}</a>
+                          <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>`;
+            ul.appendChild(li);
+          });
+        })
+        .catch(()=>{ document.getElementById('gamesList').textContent="게임 목록을 불러올 수 없습니다." });
     }
   </script>
 </body>
