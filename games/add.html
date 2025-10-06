@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>밤톨 게임즈 - 게임 등록</title>
+</head>
+<body>
+  <h1>밤톨 게임 등록</h1>
+
+  <form id="gameForm">
+    <label>이메일</label><br>
+    <input type="email" id="email" required><br><br>
+
+    <label>게임 제목</label><br>
+    <input type="text" id="title" required><br><br>
+
+    <label>게임 설명</label><br>
+    <textarea id="description" required></textarea><br><br>
+
+    <label>게임 URL</label><br>
+    <input type="url" id="url" required><br><br>
+
+    <button type="submit">등록하기</button>
+  </form>
+
+  <p id="message"></p>
+
+  <script>
+    const form = document.getElementById("gameForm");
+    const msg = document.getElementById("message");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const data = {
+        email: email.value.trim(),
+        title: title.value.trim(),
+        description: description.value.trim(),
+        url: url.value.trim()
+      };
+
+      msg.textContent = "등록 중...";
+
+      try {
+        const res = await fetch("https://backend-bzep.onrender.com/api/edit-games", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          msg.textContent = "등록 완료!";
+          form.reset();
+        } else {
+          msg.textContent = result.message;
+        }
+      } catch (error) {
+        msg.textContent = "서버 오류가 발생했습니다.";
+      }
+    });
+  </script>
+</body>
+</html>

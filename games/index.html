@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>밤톨 게임즈 | 게임을 공유하고 플레이하세요!</title>
+  <style>
+    #list div {
+      border-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+  <h1>밤톨 게임즈</h1>
+  <div class="original">
+    <a href="https://bamtolcompany.github.io/bamtol-game">밤톨컴퍼니 오리지널 게임</a>
+  </div>
+  <div id="list"></div>
+
+  <script>
+    fetch("https://backend-bzep.onrender.com/api/games")
+      .then(res => res.json())
+      .then(games => {
+        document.getElementById("list").innerHTML = games.map(g => `
+          <div>
+            <a href="/games/${g._id}">${g.title}</a>
+            <p>${g.description}</p>
+          </div>
+        `).join("");
+      });
+  </script>
+</body>
+</html>
