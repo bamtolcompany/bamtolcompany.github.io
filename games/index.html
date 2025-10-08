@@ -166,7 +166,8 @@
   <div id="detail"></div>
 
   <footer>
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2BLt2vSgThLFfBSnmTICsvJE2kLYcozMBPEKMlJ-tzgXV1A/viewform?usp=header">신고</a>
+    <a
+      href="https://docs.google.com/forms/d/e/1FAIpQLSf2BLt2vSgThLFfBSnmTICsvJE2kLYcozMBPEKMlJ-tzgXV1A/viewform?usp=header">신고</a>
     <p>&copy; 2025 bamtol company. All rights reserved.</p>
   </footer>
 
@@ -225,12 +226,30 @@
         .then(games => {
           const ul = document.getElementById('gamesList');
           ul.innerHTML = '';
-          games.forEach(g => {
+          games.forEach(async g => {
             const li = document.createElement('li');
-            li.innerHTML = `<a href="index.html?id=${g.id}">${g.title}</a>
-                            <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>`;
+
+            // 리뷰 평균 점수 가져오기
+            let avgRating = "";
+            try {
+              const res = await fetch(`https://backend-bzep.onrender.com/api/reviews/${g.id}`);
+              const reviews = await res.json();
+              if (reviews.length) {
+                const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+                avgRating = (sum / reviews.length).toFixed(1);
+              }
+            } catch {
+              avgRating = "0.0";
+            }
+
+            li.innerHTML = `
+    <a href="index.html?id=${g.id}">${g.title}</a>
+    <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>
+    <div style="margin-top:3px; color:#555;">평균 점수: ⭐${avgRating}</div>
+  `;
             ul.appendChild(li);
           });
+
         })
         .catch(() => {
           document.getElementById('gamesList').textContent = "게임 목록을 불러올 수 없습니다.";
@@ -319,4 +338,5 @@
     }
   </script>
 </body>
+
 </html>
