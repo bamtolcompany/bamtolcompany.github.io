@@ -123,11 +123,31 @@
       border-radius: 10px;
       margin-bottom: 10px;
     }
+
+    .ratingBtn {
+      border: 1px solid var(--primary-color);
+      background: #fff;
+      color: var(--primary-color);
+      cursor: pointer;
+      border-radius: 5px;
+      padding: 3px 6px;
+      margin-right: 5px;
+      transition: 0.2s;
+    }
+
+    .ratingBtn:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .ratingBtn.selected {
+      background: var(--primary-color);
+      color: white;
+    }
   </style>
 </head>
 
 <body>
-
   <div id="mainPage">
     <h1>밤톨 게임즈</h1>
     <a href="add.html" class="button">게임 등록하기</a>
@@ -156,6 +176,8 @@
     const mainPage = document.getElementById("mainPage");
     const detailDiv = document.getElementById("detail");
 
+    const CURRENT_GAME_ID = gameId;
+
     if (gameId) {
       mainPage.style.display = 'none';
       detailDiv.style.display = 'block';
@@ -173,14 +195,25 @@
 
             <div id="reviewSection">
               <h3>리뷰</h3>
-              <textarea id="reviewText" placeholder="리뷰를 입력하세요" style="width:100%; height:80px;"></textarea>
-              <input type="number" id="reviewRating" min="1" max="5" step="0.5" placeholder="평점 (1~5)">
-              <button class="button" onclick="submitReview('${g.id}')">등록</button>
+              <div id="averageRating" style="margin-bottom:10px; font-weight:bold;">평균 평점: 불러오는 중...</div>
+
+              <div id="ratingButtons" style="margin-bottom:10px;">
+                <span>평점 선택: </span>
+                <button type="button" class="ratingBtn" data-value="1">⭐</button>
+                <button type="button" class="ratingBtn" data-value="2">⭐⭐</button>
+                <button type="button" class="ratingBtn" data-value="3">⭐⭐⭐</button>
+                <button type="button" class="ratingBtn" data-value="4">⭐⭐⭐⭐</button>
+                <button type="button" class="ratingBtn" data-value="5">⭐⭐⭐⭐⭐</button>
+              </div>
+
+              <textarea id="reviewText" placeholder="리뷰를 입력하세요" style="width:100%; height:80px; margin-bottom:10px;"></textarea>
+              <button class="button" id="submitReview">등록</button>
 
               <ul id="reviewList"><li>리뷰 불러오는 중...</li></ul>
             </div>
           `;
-          loadReviews(g.id);
+
+          initReviewSection();
         })
         .catch(() => {
           detailDiv.innerHTML = "<h2>존재하지 않는 게임입니다.</h2>";
@@ -222,47 +255,67 @@
         document.getElementById('recentGameList').textContent = "최신 게임을 불러올 수 없습니다.";
       });
 
-    // 리뷰 불러오기
-    function loadReviews(gameId) {
-      fetch(`https://backend-bzep.onrender.com/api/reviews/${gameId}`)
-        .then(res => res.json())
-        .then(reviews => {
+    function initReviewSection() {
+      let selectedRating = 0;
+      const ratingButtons = document.querySelectorAll(".ratingBtn");
+      ratingButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedRating = parseInt(btn.dataset.value);
+          ratingButtons.forEach(b => b.classList.remove("selected"));
+          btn.classList.add("selected");
+        });
+      });
+
+      async function loadReviews() {
+        try {
+          const res = await fetch(`https://backend-bzep.onrender.com/api/reviews/${CURRENT_GAME_ID}`);
+          const reviews = await res.json();
           const list = document.getElementById("reviewList");
+          const avgDiv = document.getElementById("averageRating");
+
           if (!reviews.length) {
             list.innerHTML = "<li>아직 리뷰가 없습니다.</li>";
+            avgDiv.textContent = "평균 평점: 없음";
             return;
           }
+
+          const total = reviews.reduce((acc, r) => acc + r.rating, 0);
+          const avg = Math.round((total / reviews.length) * 10) / 10;
+          avgDiv.textContent = `평균 평점: ${avg} / 5`;
+
           list.innerHTML = "";
           reviews.forEach(r => {
             const li = document.createElement("li");
-            li.innerHTML = `⭐ ${r.rating}점<br>${r.comment}`;
+            const stars = "⭐".repeat(Math.round(r.rating));
+            li.innerHTML = `${stars} (${r.rating})<br>${r.comment}`;
             list.appendChild(li);
           });
-        })
-        .catch(() => {
+        } catch {
           document.getElementById("reviewList").innerHTML = "<li>리뷰를 불러올 수 없습니다.</li>";
-        });
-    }
+        }
+      }
 
-    // 리뷰 등록
-    function submitReview(gameId) {
-      const comment = document.getElementById("reviewText").value.trim();
-      const rating = parseFloat(document.getElementById("reviewRating").value);
-      if (!comment || isNaN(rating)) return alert("리뷰 내용과 평점을 입력하세요!");
+      document.getElementById("submitReview").addEventListener("click", async () => {
+        const comment = document.getElementById("reviewText").value.trim();
+        if (!comment || selectedRating === 0) return alert("리뷰 내용과 평점을 선택하세요!");
 
-      fetch("https://backend-bzep.onrender.com/api/review", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ gameId, rating, comment })
-      })
-        .then(res => res.json())
-        .then(() => {
+        try {
+          await fetch("https://backend-bzep.onrender.com/api/review", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ gameId: CURRENT_GAME_ID, rating: selectedRating, comment })
+          });
           alert("리뷰가 등록되었습니다!");
-          loadReviews(gameId);
           document.getElementById("reviewText").value = "";
-          document.getElementById("reviewRating").value = "";
-        })
-        .catch(() => alert("리뷰 등록 실패!"));
+          selectedRating = 0;
+          ratingButtons.forEach(b => b.classList.remove("selected"));
+          loadReviews();
+        } catch {
+          alert("리뷰 등록 실패!");
+        }
+      });
+
+      loadReviews();
     }
   </script>
 </body>
