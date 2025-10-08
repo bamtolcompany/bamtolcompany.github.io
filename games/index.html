@@ -11,6 +11,7 @@
     * {
       font-family: 'NanumGothic';
     }
+
     :root {
       --primary-color: rgb(4, 121, 0);
       --bg-color: #f0f4f0;
@@ -29,6 +30,7 @@
       text-decoration: none;
       color: var(--primary-color);
     }
+
     a:hover {
       text-decoration: underline;
     }
@@ -103,6 +105,24 @@
     #recentGameList li:hover {
       transform: translateY(-5px);
     }
+
+    #reviewSection {
+      margin-top: 30px;
+      border-top: 1px solid #ddd;
+      padding-top: 20px;
+    }
+
+    #reviewList {
+      list-style: none;
+      padding: 0;
+    }
+
+    #reviewList li {
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 
@@ -111,10 +131,12 @@
   <div id="mainPage">
     <h1>밤톨 게임즈</h1>
     <a href="add.html" class="button">게임 등록하기</a>
+
     <h2>최신 게임</h2>
     <ul id="recentGameList">
       <li>불러오는 중...</li>
     </ul>
+
     <h2>게임 목록</h2>
     <ul id="gamesList">
       <li>불러오는 중...</li>
@@ -122,6 +144,7 @@
   </div>
 
   <div id="detail"></div>
+
   <footer>
     <a href="https://docs.google.com/forms/d/e/1FAIpQLSf2BLt2vSgThLFfBSnmTICsvJE2kLYcozMBPEKMlJ-tzgXV1A/viewform?usp=header">신고</a>
     <p>&copy; 2025 bamtol company. All rights reserved.</p>
@@ -136,11 +159,9 @@
     if (gameId) {
       mainPage.style.display = 'none';
       detailDiv.style.display = 'block';
+
       fetch(`https://backend-bzep.onrender.com/api/game/${gameId}`)
-        .then(res => {
-          if (!res.ok) throw new Error("게임을 찾을 수 없습니다.");
-          return res.json();
-        })
+        .then(res => res.json())
         .then(g => {
           document.title = `밤톨 게임즈 - ${g.title}`;
           detailDiv.innerHTML = `
@@ -149,15 +170,23 @@
             <a href="${g.url}" target="_blank" class="button" style="margin-top:15px;">게임 플레이하기</a>
             <p style="margin-top:10px; color:#555;">조회수: ${g.views}</p>
             <button onclick="location.href='index.html'" class="button" style="margin-top:15px;">메인으로 가기</button>
+
+            <div id="reviewSection">
+              <h3>리뷰</h3>
+              <textarea id="reviewText" placeholder="리뷰를 입력하세요" style="width:100%; height:80px;"></textarea>
+              <input type="number" id="reviewRating" min="1" max="5" step="0.5" placeholder="평점 (1~5)">
+              <button class="button" onclick="submitReview('${g.id}')">등록</button>
+
+              <ul id="reviewList"><li>리뷰 불러오는 중...</li></ul>
+            </div>
           `;
+          loadReviews(g.id);
         })
-        .catch(err => {
+        .catch(() => {
           detailDiv.innerHTML = "<h2>존재하지 않는 게임입니다.</h2>";
-          console.error(err);
         });
 
     } else {
-      detailDiv.style.display = 'none';
       fetch('https://backend-bzep.onrender.com/api/games')
         .then(res => res.json())
         .then(games => {
@@ -166,7 +195,7 @@
           games.forEach(g => {
             const li = document.createElement('li');
             li.innerHTML = `<a href="index.html?id=${g.id}">${g.title}</a>
-                          <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>`;
+                            <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>`;
             ul.appendChild(li);
           });
         })
@@ -174,25 +203,67 @@
           document.getElementById('gamesList').textContent = "게임 목록을 불러올 수 없습니다.";
         });
     }
-      fetch('https://backend-bzep.onrender.com/api/games')
-    .then(res => res.json())
-    .then(games => {
-      // ID 내림차순 정렬 후 최신 5개
-      const latestGames = games.sort((a,b)=>b.id - a.id).slice(0,5);
 
-      const ul = document.getElementById('recentGameList');
-      ul.innerHTML = '';
-      latestGames.forEach(g => {
-        const li = document.createElement('li');
-        li.innerHTML = `<a href="index.html?id=${g.id}">${g.title}</a>
-                        <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>`;
-        ul.appendChild(li);
+    // 최신 게임
+    fetch('https://backend-bzep.onrender.com/api/games')
+      .then(res => res.json())
+      .then(games => {
+        const latestGames = games.sort((a, b) => b.id - a.id).slice(0, 5);
+        const ul = document.getElementById('recentGameList');
+        ul.innerHTML = '';
+        latestGames.forEach(g => {
+          const li = document.createElement('li');
+          li.innerHTML = `<a href="index.html?id=${g.id}">${g.title}</a>
+                          <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>`;
+          ul.appendChild(li);
+        });
+      })
+      .catch(() => {
+        document.getElementById('recentGameList').textContent = "최신 게임을 불러올 수 없습니다.";
       });
-    })
-    .catch(() => {
-      document.getElementById('recentGameList').textContent = "최신 게임을 불러올 수 없습니다.";
-    });
+
+    // 리뷰 불러오기
+    function loadReviews(gameId) {
+      fetch(`https://backend-bzep.onrender.com/api/reviews/${gameId}`)
+        .then(res => res.json())
+        .then(reviews => {
+          const list = document.getElementById("reviewList");
+          if (!reviews.length) {
+            list.innerHTML = "<li>아직 리뷰가 없습니다.</li>";
+            return;
+          }
+          list.innerHTML = "";
+          reviews.forEach(r => {
+            const li = document.createElement("li");
+            li.innerHTML = `⭐ ${r.rating}점<br>${r.comment}`;
+            list.appendChild(li);
+          });
+        })
+        .catch(() => {
+          document.getElementById("reviewList").innerHTML = "<li>리뷰를 불러올 수 없습니다.</li>";
+        });
+    }
+
+    // 리뷰 등록
+    function submitReview(gameId) {
+      const comment = document.getElementById("reviewText").value.trim();
+      const rating = parseFloat(document.getElementById("reviewRating").value);
+      if (!comment || isNaN(rating)) return alert("리뷰 내용과 평점을 입력하세요!");
+
+      fetch("https://backend-bzep.onrender.com/api/review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gameId, rating, comment })
+      })
+        .then(res => res.json())
+        .then(() => {
+          alert("리뷰가 등록되었습니다!");
+          loadReviews(gameId);
+          document.getElementById("reviewText").value = "";
+          document.getElementById("reviewRating").value = "";
+        })
+        .catch(() => alert("리뷰 등록 실패!"));
+    }
   </script>
 </body>
-
 </html>
