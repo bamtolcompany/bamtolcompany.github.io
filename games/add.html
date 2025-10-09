@@ -81,6 +81,14 @@
       color: var(--primary-color);
       font-weight: bold;
     }
+
+    #metaTag {
+      word-break: break-all;
+      background: #f0f0f0;
+      padding: 5px;
+      border-radius: var(--radius);
+      font-size: 14px;
+    }
   </style>
 </head>
 
@@ -103,9 +111,10 @@
     const metaTag = document.getElementById('metaTag');
     const email = document.getElementById('email');
 
+    // 이메일에 맞춰 meta 태그 실시간 업데이트
     setInterval(() => {
       metaTag.innerText = `<meta name="bamtol-games-email" content="${email.value}">`
-    }, 1000);
+    }, 500);
 
     form.addEventListener('submit', async e => {
       e.preventDefault();
@@ -119,10 +128,15 @@
         });
         const result = await res.json();
         if (!res.ok) throw new Error(result.message);
-        msg.textContent = '등록이 완료 되었습니다.';
-        setTimeout(() => location.href = 'index.html', 1500);
+
+        msg.innerHTML = `
+          등록 완료!<br>
+          입력한 이메일로 인증 메일이 발송되었습니다.<br>
+          24시간 내 이메일 인증을 완료해야 게임이 등록됩니다.
+        `;
+        form.reset();
       } catch (err) {
-        msg.textContent = "소유권 인증 실패";
+        msg.textContent = err.message || "소유권 인증 실패";
       }
     });
   </script>
