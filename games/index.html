@@ -221,40 +221,47 @@
         });
 
     } else {
-      fetch('https://backend-bzep.onrender.com/api/games')
-        .then(res => res.json())
-        .then(games => {
-          const ul = document.getElementById('gamesList');
-          ul.innerHTML = '';
-          games.forEach(async g => {
-            const li = document.createElement('li');
+  fetch('https://backend-bzep.onrender.com/api/games')
+    .then(res => res.json())
+    .then(async games => {
+      const ul = document.getElementById('gamesList');
+      ul.innerHTML = '<li>불러오는 중...</li>';
 
-            // 리뷰 평균 점수 가져오기
-            let avgRating = "";
-            try {
-              const res = await fetch(`https://backend-bzep.onrender.com/api/reviews/${g.id}`);
-              const reviews = await res.json();
-              if (reviews.length) {
-                const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
-                avgRating = (sum / reviews.length).toFixed(1);
-              }
-            } catch {
-              avgRating = "0.0";
+      const gamesWithRatings = await Promise.all(
+        games.map(async g => {
+          let avgRating = 0;
+          try {
+            const res = await fetch(`https://backend-bzep.onrender.com/api/reviews/${g.id}`);
+            const reviews = await res.json();
+            if (reviews.length) {
+              const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+              avgRating = sum / reviews.length;
             }
-
-            li.innerHTML = `
-    <a href="index.html?id=${g.id}">${g.title}</a>
-    <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>
-    <div style="margin-top:3px; color:#555;">⭐${avgRating}</div>
-  `;
-            ul.appendChild(li);
-          });
-
+          } catch {
+            avgRating = 0;
+          }
+          return { ...g, avgRating: avgRating.toFixed(1) };
         })
-        .catch(() => {
-          document.getElementById('gamesList').textContent = "게임 목록을 불러올 수 없습니다.";
-        });
-    }
+      );
+
+      gamesWithRatings.sort((a, b) => b.views - a.views);
+
+      ul.innerHTML = '';
+      for (const g of gamesWithRatings) {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <a href="index.html?id=${g.id}">${g.title}</a>
+          <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>
+          <div style="margin-top:3px; color:#555;">⭐${g.avgRating}</div>
+        `;
+        ul.appendChild(li);
+      }
+    })
+    .catch(() => {
+      document.getElementById('gamesList').textContent = "게임 목록을 불러올 수 없습니다.";
+    });
+}
+
 
     // 최신 게임
     fetch('https://backend-bzep.onrender.com/api/games')
