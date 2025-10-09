@@ -81,14 +81,6 @@
       color: var(--primary-color);
       font-weight: bold;
     }
-
-    #metaTag {
-      word-break: break-all;
-      background: #f0f0f0;
-      padding: 5px;
-      border-radius: var(--radius);
-      font-size: 14px;
-    }
   </style>
 </head>
 
@@ -111,17 +103,12 @@
     const metaTag = document.getElementById('metaTag');
     const email = document.getElementById('email');
 
-    // 이메일에 맞춰 meta 태그 실시간 업데이트
     setInterval(() => {
       metaTag.innerText = `<meta name="bamtol-games-email" content="${email.value}">`
-    }, 500);
+    }, 1000);
 
     form.addEventListener('submit', async e => {
       e.preventDefault();
-      const submitButton = form.querySelector('button[type="submit"]');
-      submitButton.disabled = true;
-      msg.textContent = '등록 중...';
-
       const data = Object.fromEntries(new FormData(form).entries());
 
       try {
@@ -130,27 +117,12 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
-
         const result = await res.json();
-        if (!res.ok) {
-          throw new Error(result.message || '알 수 없는 오류가 발생했습니다.');
-        }
-
-        msg.innerHTML = `
-          <strong>등록 요청 완료!</strong><br>
-          입력하신 이메일로 인증 메일이 발송되었습니다.<br>
-          24시간 내에 이메일 인증을 완료해야 게임이 최종 등록됩니다.<br>
-          3초 후 메인 페이지로 이동합니다.
-        `;
-        form.reset();
-
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 3000);
-
+        if (!res.ok) throw new Error(result.message);
+        msg.textContent = '등록이 완료 되었습니다.';
+        setTimeout(() => location.href = 'index.html', 1500);
       } catch (err) {
-        msg.textContent = `오류: ${err.message}`;
-        submitButton.disabled = false;
+        msg.textContent = "소유권 인증 실패";
       }
     });
   </script>

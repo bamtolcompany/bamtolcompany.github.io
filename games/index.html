@@ -186,19 +186,14 @@
       detailDiv.style.display = 'block';
 
       fetch(`https://backend-bzep.onrender.com/api/game/${gameId}`)
-        .then(res => {
-          if (!res.ok) throw new Error('Game not found');
-          return res.json();
-        })
+        .then(res => res.json())
         .then(g => {
           document.title = `밤톨 게임즈 - ${g.title}`;
-          const avgRating = g.avgRating ? g.avgRating.toFixed(1) : 'N/A';
           detailDiv.innerHTML = `
             <h2 style="color: var(--primary-color); margin-bottom:10px;">${g.title}</h2>
             <p style="font-size:16px; line-height:1.5;">${g.description}</p>
-            <p style="font-size:16px; line-height:1.5;">게시자: ${g.email}</p>
             <a href="${g.url}" target="_blank" class="button" style="margin-top:15px;">게임 플레이하기</a>
-            <p style="margin-top:10px; color:#555;">조회수: ${g.views} | ⭐ ${avgRating}</p>
+            <p style="margin-top:10px; color:#555;">조회수: ${g.views}</p>
             <button onclick="location.href='index.html'" class="button" style="margin-top:15px;">메인으로 가기</button>
 
             <div id="reviewSection">
@@ -224,40 +219,50 @@
           initReviewSection();
         })
         .catch(() => {
-          detailDiv.innerHTML = "<h2>존재하지 않거나 아직 인증되지 않은 게임입니다.</h2><a href='index.html' class='button'>메인으로 돌아가기</a>";
+          detailDiv.innerHTML = "<h2>존재하지 않는 게임입니다.</h2>";
         });
 
     } else {
-      fetch('https://backend-bzep.onrender.com/api/games')
-        .then(res => {
-            if (!res.ok) throw new Error('Failed to load games');
-            return res.json();
-        })
-        .then(games => {
-          const ul = document.getElementById('gamesList');
-          if (!games || games.length === 0) {
-              ul.innerHTML = '<li>아직 등록된 게임이 없습니다.</li>';
-              return;
-          }
+  fetch('https://backend-bzep.onrender.com/api/games')
+    .then(res => res.json())
+    .then(async games => {
+      const ul = document.getElementById('gamesList');
+      ul.innerHTML = '<li>불러오는 중...</li>';
 
-          games.sort((a, b) => b.views - a.views);
-
-          ul.innerHTML = '';
-          for (const g of games) {
-            const li = document.createElement('li');
-            const avgRating = g.avgRating ? g.avgRating.toFixed(1) : 'N/A';
-            li.innerHTML = `
-              <a href="index.html?id=${g.id}">${g.title}</a>
-              <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>
-              <div style="margin-top:3px; color:#555;">⭐${avgRating}</div>
-            `;
-            ul.appendChild(li);
+      const gamesWithRatings = await Promise.all(
+        games.map(async g => {
+          let avgRating = 0;
+          try {
+            const res = await fetch(`https://backend-bzep.onrender.com/api/reviews/${g.id}`);
+            const reviews = await res.json();
+            if (reviews.length) {
+              const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+              avgRating = sum / reviews.length;
+            }
+          } catch {
+            avgRating = 0;
           }
+          return { ...g, avgRating: avgRating.toFixed(1) };
         })
-        .catch(() => {
-          document.getElementById('gamesList').textContent = "게임 목록을 불러올 수 없습니다.";
-        });
-    }
+      );
+
+      gamesWithRatings.sort((a, b) => b.views - a.views);
+
+      ul.innerHTML = '';
+      for (const g of gamesWithRatings) {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <a href="index.html?id=${g.id}">${g.title}</a>
+          <div style="margin-top:5px; color:#555;">조회수: ${g.views}</div>
+          <div style="margin-top:3px; color:#555;">⭐${g.avgRating}</div>
+        `;
+        ul.appendChild(li);
+      }
+    })
+    .catch(() => {
+      document.getElementById('gamesList').textContent = "게임 목록을 불러올 수 없습니다.";
+    });
+}
 
 
     // 최신 게임
