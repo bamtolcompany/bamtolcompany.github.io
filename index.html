@@ -462,6 +462,7 @@
 
     <div style="display: flex; gap:5px;">
       <div style="position: relative; display: inline-block; width: 85%;">
+        <div id="query-sentinel"></div>
         <input type="search" id="query" placeholder="검색어를 입력하세요" autocomplete="off">
         <ul id="autocomplete-list"
           style="position: absolute; z-index: 1000; background: white; border-radius: 10px; list-style: none; margin: 0; padding: 0; width: 100%; display: none; max-height: 200px; overflow-y: auto;">
@@ -785,13 +786,13 @@
 
       recognition.onerror = function (event) {
         Swal.fire({
-            title: '음성 인식 오류: ' + event.error,
-            icon: 'error',
-            confirmButtonText: '확인',
-            confirmButtonColor: 'red',
-            scrollbarPadding: false,
-            allowEnterKey: false
-          });
+          title: '음성 인식 오류: ' + event.error,
+          icon: 'error',
+          confirmButtonText: '확인',
+          confirmButtonColor: 'red',
+          scrollbarPadding: false,
+          allowEnterKey: false
+        });
       };
     }
     function setTime(lang) {
@@ -966,6 +967,31 @@
         specialLogo.src = "추석.png";
       }
     }
+const input = document.getElementById('query');
+const sentinel = document.getElementById('query-sentinel');
+
+const observer = new IntersectionObserver(([entry]) => {
+  if (!entry.isIntersecting) {
+    input.style.position = 'fixed';
+    input.style.top = '0';
+    input.style.left = '50%';
+    input.style.borderRadius = '0'
+    input.style.transform = 'translateX(-50%)';
+    input.style.zIndex = '999';
+    input.style.width = '100%';
+  } else {
+    input.style.position = '';
+    input.style.top = '';
+    input.style.left = '';
+    input.style.transform = '';
+    input.style.zIndex = '';
+    input.style.width = '';
+    input.style.borderRadius = ''
+  }
+}, { threshold: 0 });
+
+observer.observe(sentinel);
+
     logo();
   </script>
   <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
