@@ -460,9 +460,8 @@
       <img id="specialLogo">
     </div>
 
-    <div style="display: flex; gap:5px;">
+    <div style="display: flex; gap:5px; transition: 0s;" id="inputContainer">
       <div style="position: relative; display: inline-block; width: 85%;">
-        <div id="query-sentinel"></div>
         <input type="search" id="query" placeholder="검색어를 입력하세요" autocomplete="off">
         <ul id="autocomplete-list"
           style="position: absolute; z-index: 1000; background: white; border-radius: 10px; list-style: none; margin: 0; padding: 0; width: 100%; display: none; max-height: 200px; overflow-y: auto;">
@@ -474,6 +473,7 @@
       <img src="https://www.gstatic.com/images/branding/googlemic/2x/googlemic_color_24dp.png"
         onclick="startVoiceRecognition()">
     </div>
+    <div id="query-sentinel"></div>
 
     <section class="category-section">
       <button onclick="search('images')" class="category">이미지 검색</button>
@@ -753,7 +753,7 @@
         }
       }
     });
-
+// 음성인식 하는 코드
 
     function startVoiceRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -967,26 +967,28 @@
         specialLogo.src = "추석.png";
       }
     }
+    // 검색창 고정 하는 코드
 const input = document.getElementById('query');
 const sentinel = document.getElementById('query-sentinel');
+const inputContainer = document.getElementById('inputContainer')
 
 const observer = new IntersectionObserver(([entry]) => {
   if (!entry.isIntersecting) {
-    input.style.position = 'fixed';
-    input.style.top = '0';
-    input.style.left = '50%';
-    input.style.borderRadius = '0'
-    input.style.transform = 'translateX(-50%)';
-    input.style.zIndex = '999';
-    input.style.width = '100%';
+    inputContainer.style.position = 'fixed';
+    inputContainer.style.top = '0px';
+    inputContainer.style.left = '50%';
+    inputContainer.style.transform = 'translateX(-50%)';
+    inputContainer.style.zIndex = '999';
+    inputContainer.style.width = '100%';
+    inputContainer.style.backgroundColor = '#1AC8FF'
   } else {
-    input.style.position = '';
-    input.style.top = '';
-    input.style.left = '';
-    input.style.transform = '';
-    input.style.zIndex = '';
-    input.style.width = '';
-    input.style.borderRadius = ''
+    inputContainer.style.position = '';
+    inputContainer.style.top = '';
+    inputContainer.style.left = '';
+    inputContainer.style.transform = '';
+    inputContainer.style.zIndex = '';
+    inputContainer.style.width = '';
+    inputContainer.style.backgroundColor = ''
   }
 }, { threshold: 0 });
 
