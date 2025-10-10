@@ -970,7 +970,8 @@
     // 검색창 고정 하는 코드
 const input = document.getElementById('query');
 const sentinel = document.getElementById('query-sentinel');
-const inputContainer = document.getElementById('inputContainer')
+const inputContainer = document.getElementById('inputContainer');
+const body = document.querySelector('body');
 
 const observer = new IntersectionObserver(([entry]) => {
   if (!entry.isIntersecting) {
@@ -980,7 +981,21 @@ const observer = new IntersectionObserver(([entry]) => {
     inputContainer.style.transform = 'translateX(-50%)';
     inputContainer.style.zIndex = '999';
     inputContainer.style.width = '100%';
-    inputContainer.style.backgroundColor = '#1AC8FF'
+    if (body.className == 'dark') {
+      inputContainer.style.backgroundColor = 'black';
+    }
+    else if (body.className == 'white') {
+      inputContainer.style.backgroundColor = 'white';
+    }
+    else if (body.className == 'yellow') {
+      inputContainer.style.backgroundColor = 'lightyellow';
+    }
+    else if (body.className == 'window') {
+      inputContainer.style.backgroundColor = '';
+    }
+    else {
+      inputContainer.style.backgroundColor = '#1AC8FF';
+    }
   } else {
     inputContainer.style.position = '';
     inputContainer.style.top = '';
