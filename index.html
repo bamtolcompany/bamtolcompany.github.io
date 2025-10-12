@@ -52,6 +52,14 @@
       src: url("font/NanumBarunpenR.ttf") format("truetype");
       font-weight: normal;
       font-style: normal;
+      unicode-range: U+0020-007E,
+      U+00A0-00FF,
+      U+AC00-D7A3,
+      U+1100-11FF,
+      U+3130-318F,
+      U+3200-321E,
+      U+3260-327F,
+      U+FFE0-FFE6;;
     }
 
     .white {
@@ -134,7 +142,7 @@
 
     * {
       transition: 0.3s;
-      font-family: "nanum", sans-serif;
+      font-family: "nanum", "NanumGothic", sans-serif;
     }
 
     h1 {
@@ -769,7 +777,13 @@
         newsContainer.innerHTML = ''; // Clear loading message
 
         // Display a limited number of items
-        const maxItems = 10;
+        var maxItems;
+        if (mobile()) {
+          maxItems = 5;
+        }
+        else {
+          maxItems = 10;
+        }
         allItems.slice(0, maxItems).forEach(item => {
           const newsItem = document.createElement('div');
           newsItem.className = 'news-item';
