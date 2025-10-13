@@ -53,13 +53,14 @@
       font-weight: normal;
       font-style: normal;
       unicode-range: U+0020-007E,
-      U+00A0-00FF,
-      U+AC00-D7A3,
-      U+1100-11FF,
-      U+3130-318F,
-      U+3200-321E,
-      U+3260-327F,
-      U+FFE0-FFE6;;
+        U+00A0-00FF,
+        U+AC00-D7A3,
+        U+1100-11FF,
+        U+3130-318F,
+        U+3200-321E,
+        U+3260-327F,
+        U+FFE0-FFE6;
+      ;
     }
 
     .white {
@@ -423,6 +424,7 @@
         width: 97%;
       }
     }
+
     #news-dashboard {
       margin-top: 20px;
       padding: 20px;
@@ -443,16 +445,70 @@
       margin-top: 10px;
     }
 
+    .m-news {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .m-news ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 5px;
+    }
+
+    .m-news ul li {
+      border: 1px solid #000;
+      margin: -1px;
+      min-height: 100px;
+      box-sizing: border-box;
+    }
+    .m-news ul li:hover {
+      transform: scale(1.1, 1.1)
+    }
+
+    .white .m-news ul li,
+    .yellow .m-news ul li {
+      border-color: #ddd;
+    }
+
+    .m-news ul li a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      text-decoration: none;
+      color: #333;
+      font-size: 14px;
+      font-weight: bold;
+      word-break: keep-all;
+    }
+    .m-news-container {
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 20px;
+    }
+
     .news-item {
       background-color: white;
       border: 1px solid #ddd;
       border-radius: 8px;
       padding: 15px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+
     .dark .news-item {
       background-color: #303030;
     }
+
     .dark #news-dashboard h2 {
       color: white;
     }
@@ -467,9 +523,11 @@
       color: #0056b3;
       font-size: initial;
     }
+
     .dark .news-item h3 a {
       color: #1f5bff;
     }
+
     #query {
       height: 40px !important;
     }
@@ -483,9 +541,11 @@
       color: #555;
       margin: 0 0 10px 0;
     }
+
     .dark .news-item p {
       color: #ffffff;
     }
+
     .dark #news-dashboard p {
       color: white;
     }
@@ -505,7 +565,7 @@
 
     #exchange-rate-container {
       flex: 6;
-      background-color: #f9f9f9;
+      background-color: rgba(255, 255, 255, 0.8);
       padding: 20px;
       border-radius: 10px;
       min-width: 300px;
@@ -513,35 +573,36 @@
 
     #notepad-container {
       flex: 4;
-      background-color: #f9f9f9;
+      background-color: rgba(255, 255, 255, 0.8);
       padding: 20px;
       border-radius: 10px;
       min-width: 300px;
     }
 
-    #exchange-rate-container h2, #notepad-container h2 {
+    #exchange-rate-container h2,
+    #notepad-container h2 {
       text-align: center;
       color: #333;
       font-family: "NanumSquareRound";
     }
 
     #exchange-rate-display {
-        font-size: 1.2em;
-        text-align: center;
-        margin-bottom: 15px;
+      font-size: 1.2em;
+      text-align: center;
+      margin-bottom: 15px;
     }
 
     #krw-input {
-        width: calc(100% - 30px);
-        margin-bottom: 10px;
-        height: 10px;
+      width: calc(100% - 30px);
+      margin-bottom: 10px;
+      height: 10px;
     }
 
     #usd-output {
-        font-size: 1.1em;
-        font-weight: bold;
-        text-align: center;
-        color: #0056b3;
+      font-size: 1.1em;
+      font-weight: bold;
+      text-align: center;
+      color: #0056b3;
     }
 
     #notepad {
@@ -554,39 +615,64 @@
       font-family: "nanum", "NanumGothic", sans-serif;
       box-sizing: border-box;
     }
+
     .dark #notepad-container {
       background-color: #292929;
     }
+
     .dark #notepad-container h2 {
       color: white;
     }
+
     .dark #notepad {
       background-color: #303030;
       color: white;
       border-color: #303030;
     }
+
     .dark #notepad::placeholder {
       color: #c0c0c0;
     }
+
     .dark #exchange-rate-container {
       background-color: #292929;
       color: white;
     }
+
     .dark #exchange-rate-container h2 {
       color: white;
     }
+
     .dark #usd-output {
       color: #ffffff;
     }
-    .dark #news-dashboard {
+
+    .dark #news-dashboard,
+    .dark .m-news-container {
       background-color: #292929;
+    }
+
+    .dark .m-news-container h2 {
+      color: white;
+    }
+
+    .dark .m-news ul li {
+      background-color: #333;
+      border-color: #444;
+    }
+
+    .dark .m-news ul li a {
+      color: #eee;
+      font-family: 'Malgun Gothic', 'Dotum', sans-serif;
     }
 
     @media (max-width: 768px) {
       .new-features-container {
         flex-direction: column;
       }
-      #exchange-rate-container, #notepad-container {
+
+      #exchange-rate-container,
+      #notepad-container {
         flex: 1;
       }
     }
@@ -680,23 +766,62 @@
       </div>
     </div>
     <section id="news-dashboard">
-      <h2><span style="color: rgb(0, 68, 255);">G</span><span style="color: rgb(255, 17, 0);">o</span><span style="color: rgb(255, 196, 0);">o</span><span style="color: rgb(0, 68, 255);">g</span><span style="color: green;">l</span><span style="color: rgb(255, 17, 0);">e</span> 뉴스</h2>
+      <h2><span style="color: rgb(0, 68, 255);">G</span><span style="color: rgb(255, 17, 0);">o</span><span
+          style="color: rgb(255, 196, 0);">o</span><span style="color: rgb(0, 68, 255);">g</span><span
+          style="color: green;">l</span><span style="color: rgb(255, 17, 0);">e</span> 뉴스</h2>
       <div id="news-container"></div>
-      <p>powered by <span style="color: rgb(0, 68, 255);">G</span><span style="color: rgb(255, 17, 0);">o</span><span style="color: rgb(255, 196, 0);">o</span><span style="color: rgb(0, 68, 255);">g</span><span style="color: green;">l</span><span style="color: rgb(255, 17, 0);">e</span> news</p>
-        </section>
-        <div class="new-features-container">
-          <div id="exchange-rate-container">
-            <h2>환율</h2>
-            <div id="exchange-rate-display"></div>
-            <input type="number" id="krw-input" placeholder="원을 입력해주세요">
-            <p id="usd-output"></p>
-          </div>
-          <div id="notepad-container">
-            <h2>메모장</h2>
-            <textarea id="notepad" placeholder="메모를 입력해주세요"></textarea>
-          </div>
-        </div>
-      </main>
+      <p>powered by <span style="color: rgb(0, 68, 255);">G</span><span style="color: rgb(255, 17, 0);">o</span><span
+          style="color: rgb(255, 196, 0);">o</span><span style="color: rgb(0, 68, 255);">g</span><span
+          style="color: green;">l</span><span style="color: rgb(255, 17, 0);">e</span> news</p>
+    </section>
+    <div class="new-features-container">
+      <div id="exchange-rate-container">
+        <h2>환율</h2>
+        <div id="exchange-rate-display"></div>
+        <input type="number" id="krw-input" placeholder="원을 입력해주세요">
+        <p id="usd-output"></p>
+      </div>
+      <div id="notepad-container">
+        <h2>메모장</h2>
+        <textarea id="notepad" placeholder="메모를 입력해주세요"></textarea>
+      </div>
+    </div>
+    <div class="m-news-container">
+      <h2>언론사 모음</h2>
+      <div class="m-news">
+        <ul>
+          <li><a href="https://imnews.imbc.com/">MBC뉴스</a></li>
+          <li><a href="https://news.sbs.co.kr/">SBS뉴스</a></li>
+          <li><a href="https://news.kbs.co.kr/">KBS뉴스</a></li>
+          <li><a href="https://www.ytn.co.kr/">YTN뉴스</a></li>
+          <li><a href="https://www.chosun.com/">조선일보</a></li>
+          <li><a href="https://www.hani.co.kr/">한겨레</a></li>
+
+          <li><a href="https://www.yonhapnewstv.co.kr/">연합뉴스TV</a></li>
+          <li><a href="https://www.newsis.com/">뉴시스</a></li>
+          <li><a href="https://sports.chosun.com/">스포츠조선</a></li>
+          <li><a href="http://www.ohmynews.com/">오마이뉴스</a></li>
+          <li><a href="https://www.bloter.net/">블로터</a></li>
+          <li><a href="https://koreajoongangdaily.joins.com/">Korea JoongAng Daily</a></li>
+
+          <li><a href="https://www.asiae.co.kr/">아시아경제</a></li>
+          <li><a href="https://zdnet.co.kr/">지디넷 코리아</a></li>
+          <li><a href="https://www.inews24.com/">아이뉴스24</a></li>
+          <li><a href="http://www.kyeongin.com/">경인일보</a></li>
+          <li><a href="http://www.incheonilbo.com/">인천일보</a></li>
+          <li><a href="http://www.kihoilbo.co.kr/">기호일보</a></li>
+
+          <li><a href="https://www.koreatimes.co.kr/">The Korea Times</a></li>
+          <li><a href="https://www.edaily.co.kr/">이데일리</a></li>
+          <li><a href="https://www.fntimes.com/">한국금융신문</a></li>
+          <li><a href="https://news.jtbc.co.kr/">JTBC</a></li>
+          <li><a href="https://newstapa.org/">뉴스타파</a></li>
+          <li><a href="http://www.ddaily.co.kr/">디지털데일리</a></li>
+        </ul>
+      </div>
+    </div>
+
+  </main>
   <aside>
     <p>광고</p>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9258543756875713"
@@ -868,10 +993,10 @@
         const data = await response.json();
         usdToKrwRate = data.usd.krw;
         exchangeRateDisplay.innerHTML = `1달러 = ${usdToKrwRate.toFixed(2)}원`;
-        
+
         const krwInput = document.getElementById('krw-input');
-        if(krwInput) {
-            krwInput.addEventListener('input', convertCurrency);
+        if (krwInput) {
+          krwInput.addEventListener('input', convertCurrency);
         }
 
       } catch (error) {
@@ -881,33 +1006,33 @@
     }
 
     function convertCurrency() {
-        const krwInput = document.getElementById('krw-input');
-        const usdOutput = document.getElementById('usd-output');
-        const krwAmount = parseFloat(krwInput.value);
+      const krwInput = document.getElementById('krw-input');
+      const usdOutput = document.getElementById('usd-output');
+      const krwAmount = parseFloat(krwInput.value);
 
-        if (isNaN(krwAmount) || krwAmount <= 0) {
-            usdOutput.innerHTML = "";
-            return;
-        }
+      if (isNaN(krwAmount) || krwAmount <= 0) {
+        usdOutput.innerHTML = "";
+        return;
+      }
 
-        if (usdToKrwRate > 0) {
-            const usdAmount = krwAmount / usdToKrwRate;
-            usdOutput.innerHTML = `${krwAmount.toLocaleString()}원은 약 ${usdAmount.toFixed(2)}달러입니다.`;
-        } else {
-            usdOutput.innerHTML = "환율 정보가 없습니다.";
-        }
+      if (usdToKrwRate > 0) {
+        const usdAmount = krwAmount / usdToKrwRate;
+        usdOutput.innerHTML = `${krwAmount.toLocaleString()}원은 약 ${usdAmount.toFixed(2)}달러입니다.`;
+      } else {
+        usdOutput.innerHTML = "환율 정보가 없습니다.";
+      }
     }
 
     function setupNotepad() {
       const notepad = document.getElementById('notepad');
-      if(notepad) {
-          const savedNote = localStorage.getItem('notepadContent');
-          if (savedNote) {
+      if (notepad) {
+        const savedNote = localStorage.getItem('notepadContent');
+        if (savedNote) {
           notepad.value = savedNote;
-          }
-          notepad.addEventListener('input', () => {
+        }
+        notepad.addEventListener('input', () => {
           localStorage.setItem('notepadContent', notepad.value);
-          });
+        });
       }
     }
 
@@ -940,7 +1065,7 @@
             const link = item.querySelector('link')?.textContent || '#';
             const description = item.querySelector('description')?.textContent.replace(/<[^>]*>?/gm, '').substring(0, 100) + '...' || '';
             const pubDate = item.querySelector('pubDate')?.textContent || '';
-            
+
             allItems.push({
               title,
               link,
@@ -1076,7 +1201,7 @@
         }
       }
     });
-// 음성인식 하는 코드
+    // 음성인식 하는 코드
 
     function startVoiceRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1291,51 +1416,51 @@
       }
     }
     // 검색창 고정 하는 코드
-const input = document.getElementById('query');
-const sentinel = document.getElementById('query-sentinel');
-const inputContainer = document.getElementById('inputContainer');
-const body = document.querySelector('body');
+    const input = document.getElementById('query');
+    const sentinel = document.getElementById('query-sentinel');
+    const inputContainer = document.getElementById('inputContainer');
+    const body = document.querySelector('body');
 
-const observer = new IntersectionObserver(([entry]) => {
-  if (!entry.isIntersecting) {
-    inputContainer.style.position = 'fixed';
-    inputContainer.style.top = '0px';
-    inputContainer.style.left = '50%';
-    inputContainer.style.transform = 'translateX(-50%)';
-    inputContainer.style.zIndex = '999';
-    inputContainer.style.width = '100%';
-    inputContainer.style.padding = '10px';
-    inputContainer.style.paddingLeft = '30px';
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) {
+        inputContainer.style.position = 'fixed';
+        inputContainer.style.top = '0px';
+        inputContainer.style.left = '50%';
+        inputContainer.style.transform = 'translateX(-50%)';
+        inputContainer.style.zIndex = '999';
+        inputContainer.style.width = '100%';
+        inputContainer.style.padding = '10px';
+        inputContainer.style.paddingLeft = '30px';
 
-    if (body.className == 'dark') {
-      inputContainer.style.backgroundColor = 'black';
-    }
-    else if (body.className == 'white') {
-      inputContainer.style.backgroundColor = 'white';
-    }
-    else if (body.className == 'yellow') {
-      inputContainer.style.backgroundColor = 'lightyellow';
-    }
-    else if (body.className == 'window') {
-      inputContainer.style.backgroundColor = '';
-    }
-    else {
-      inputContainer.style.backgroundColor = '#1AC8FF';
-    }
-  } else {
-    inputContainer.style.position = '';
-    inputContainer.style.top = '';
-    inputContainer.style.left = '';
-    inputContainer.style.transform = '';
-    inputContainer.style.zIndex = '';
-    inputContainer.style.width = '';
-    inputContainer.style.backgroundColor = '';
-    inputContainer.style.padding = '';
-    inputContainer.style.paddingLeft = '';
-  }
-}, { threshold: 0 });
+        if (body.className == 'dark') {
+          inputContainer.style.backgroundColor = 'black';
+        }
+        else if (body.className == 'white') {
+          inputContainer.style.backgroundColor = 'white';
+        }
+        else if (body.className == 'yellow') {
+          inputContainer.style.backgroundColor = 'lightyellow';
+        }
+        else if (body.className == 'window') {
+          inputContainer.style.backgroundColor = '';
+        }
+        else {
+          inputContainer.style.backgroundColor = '#1AC8FF';
+        }
+      } else {
+        inputContainer.style.position = '';
+        inputContainer.style.top = '';
+        inputContainer.style.left = '';
+        inputContainer.style.transform = '';
+        inputContainer.style.zIndex = '';
+        inputContainer.style.width = '';
+        inputContainer.style.backgroundColor = '';
+        inputContainer.style.padding = '';
+        inputContainer.style.paddingLeft = '';
+      }
+    }, { threshold: 0 });
 
-observer.observe(sentinel);
+    observer.observe(sentinel);
 
     logo();
   </script>
