@@ -676,6 +676,179 @@
         flex: 1;
       }
     }
+
+    @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+    /* General retro styles */
+    .window {
+        font-family: 'VT323', monospace;
+        background-color: #00b899 !important;
+        border: 2px solid #000;
+        box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.5);
+    }
+
+    .window * {
+        transition: none !important;
+    }
+
+    /* Header and Title Bar */
+    .window .top {
+        background-color: #000080;
+        color: white;
+        padding: 5px;
+        font-weight: bold;
+        border-bottom: 2px solid #000;
+        border-radius: 0;
+    }
+
+    /* Buttons and Categories */
+    .window button, .window .category {
+        font-family: 'VT323', monospace;
+        background-color: #c0c0c0;
+        border: 2px solid #000;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+        border-radius: 0;
+    }
+
+    .window button:active, .window .category:active {
+        box-shadow: none;
+        transform: translate(2px, 2px);
+    }
+
+    /* Remove hover effects */
+    .window button:hover,
+    .window .category:hover,
+    .window .list:hover,
+    .window .footer-link:hover,
+    .window .about-sites a:hover {
+        transform: none;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+        background-color: #c0c0c0;
+        text-decoration: none;
+        color: black;
+        border-color: black;
+    }
+
+    /* Sharp corners for all elements */
+    .window input,
+    .window .ai,
+    .window #news-dashboard,
+    .window .news-item,
+    .window #exchange-rate-container,
+    .window #notepad-container,
+    .window #notepad,
+    .window .about-sites a,
+    .window fieldset {
+        border-radius: 0 !important;
+    }
+    .window #krw-input {
+      height: 30px;
+    }
+
+    /* Form elements styling */
+    .window input[type="search"],
+    .window input[type="number"],
+    .window textarea,
+    .window select {
+        font-family: 'VT323', monospace;
+        background-color: white;
+        border: 2px inset #7f7f7f;
+        box-shadow: none;
+        padding: 5px;
+    }
+
+    /* Footer styling */
+    .window footer {
+        background-color: #c0c0c0;
+        border-top: 2px solid #000;
+        padding: 10px;
+    }
+
+    .window footer p, .window footer a {
+        font-family: 'VT323', monospace;
+        color: #000;
+    }
+
+    .window .footer-link {
+        color: #0000ff;
+        text-decoration: underline;
+    }
+
+    .window .footer-link:hover {
+        color: #0000ff;
+        text-decoration: underline;
+        background-color: transparent;
+        box-shadow: none;
+    }
+
+    /* Style for the section containers */
+    .window #news-dashboard,
+    .window #exchange-rate-container,
+    .window #notepad-container,
+    .window .m-news-container {
+        background-color: #c0c0c0;
+        border: 2px solid #000;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+        padding: 10px;
+    }
+
+    /* Headings within the sections */
+    .window #news-dashboard h2,
+    .window #exchange-rate-container h2,
+    .window #notepad-container h2,
+    .window .m-news-container h2 {
+        font-family: 'VT323', monospace;
+        color: #000;
+        text-align: left;
+        padding: 5px;
+        background-color: #000080; /* Title bar color */
+        color: white;
+        margin-top: 0;
+    }
+
+    /* News item styling */
+    .window .news-item {
+        background-color: #fff;
+        border: 2px inset #7f7f7f;
+        padding: 10px;
+        box-shadow: none;
+    }
+
+    .window .news-item h3 a {
+        font-family: 'VT323', monospace;
+        font-size: 1.2em; /* Make it a bit larger */
+        color: #0000ff;
+        text-decoration: underline;
+    }
+
+    .window .news-item p {
+        font-family: 'VT323', monospace;
+        color: #000;
+    }
+
+    /* Exchange rate display */
+    .window #exchange-rate-display,
+    .window #usd-output {
+        font-family: 'VT323', monospace;
+        color: #000;
+    }
+
+    /* Media news list */
+    .window .m-news ul {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    .window .m-news ul li {
+        border: 1px solid #000;
+        background-color: #fff;
+    }
+
+    .window .m-news ul li a {
+        font-family: 'VT323', monospace;
+        color: #0000ff;
+        text-decoration: underline;
+        font-size: 16px;
+    }
   </style>
 </head>
 
@@ -1341,6 +1514,52 @@
       return "알 수 없음";
     }
 
+    const newsAgencyMap = {
+      'MBC뉴스': '문화방송',
+      'SBS뉴스': '서울방송',
+      'KBS뉴스': '한국방송',
+      'YTN뉴스': '연합텔레비젼뉴스',
+      '조선일보': '조선일보',
+      '한겨레': '한겨레',
+      '연합뉴스TV': '연합뉴스',
+      '뉴시스': '뉴시스',
+      '스포츠조선': '스포츠조선',
+      '오마이뉴스': '오마이뉴스',
+      '블로터': '블로터닷넷',
+      'Korea JoongAng Daily': '코리아 중앙 데이리',
+      '아시아경제': '아세아경제',
+      '지디넷 코리아': '지디넷 코리아',
+      '아이뉴스24': '아이뉴스24',
+      '경인일보': '경인일보',
+      '인천일보': '인천일보',
+      '기호일보': '기호일보',
+      'The Korea Times': '코리아타임스',
+      '이데일리': '이데이리',
+      '한국금융신문': '한국금융신문',
+      'JTBC': '제이티비씨',
+      '뉴스타파': '뉴스타파',
+      '디지털데일리': '디지탈데이리'
+    };
+
+    function updateNewsAgencyNames(theme) {
+      const newsLinks = document.querySelectorAll('.m-news ul li a');
+      newsLinks.forEach(link => {
+        if (!link.dataset.originalName) {
+          link.dataset.originalName = link.textContent;
+        }
+
+        if (theme === 'window') {
+          const originalName = link.dataset.originalName;
+          const newName = newsAgencyMap[originalName];
+          if (newName) {
+            link.textContent = newName;
+          }
+        } else {
+          link.textContent = link.dataset.originalName;
+        }
+      });
+    }
+
     function fetchWeather(lat, lon, city) {
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
         .then(res => res.json())
@@ -1380,6 +1599,7 @@
       } else {
         if (retroLink) retroLink.remove();
       }
+      updateNewsAgencyNames(value);
     }
 
     setTime(language);
@@ -1391,6 +1611,7 @@
     const savedTheme = localStorage.getItem("테마") || "none";
     document.body.className = savedTheme === "none" ? "" : savedTheme;
     document.getElementById('theme-select').value = savedTheme;
+    updateNewsAgencyNames(savedTheme);
 
     if (savedTheme === "window") {
       const retroLink = document.createElement("link");
