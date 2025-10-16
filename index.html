@@ -428,6 +428,7 @@
     #news-dashboard {
       margin-top: 20px;
       padding: 20px;
+      margin-bottom: 20px;
       background-color: #ffffffce;
       border-radius: 10px;
     }
@@ -548,6 +549,156 @@
 
     .dark #news-dashboard p {
       color: white;
+    }
+
+    #read-later-section {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #ffffffce;
+      border-radius: 10px;
+    }
+
+    #read-later-section h2 {
+      text-align: center;
+      color: #333;
+      font-family: "NanumSquareRound";
+    }
+
+    #read-later-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    #read-later-list li {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    #read-later-list li a {
+      text-decoration: none;
+      color: #0056b3;
+      font-size: initial;
+      font-weight: bold;
+    }
+
+    #read-later-list li a:hover {
+      text-decoration: underline;
+    }
+
+    .dark #read-later-section {
+      background-color: #292929;
+    }
+
+    .dark #read-later-section h2 {
+      color: white;
+    }
+
+    .dark #read-later-list li {
+      background-color: #303030;
+      border-color: #444;
+    }
+
+    .dark #read-later-list li a {
+      color: #1f5bff;
+    }
+
+    #custom-context-menu {
+      position: absolute;
+      z-index: 10000;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      padding: 5px 0;
+    }
+
+    #custom-context-menu button {
+      display: block;
+      width: 100%;
+      padding: 8px 15px;
+      border: none;
+      background: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      height: auto;
+      border-radius: 0;
+      color: black;
+    }
+
+    #custom-context-menu button:hover {
+      background-color: #f0f0f0;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Dark Theme Context Menu */
+    .dark #custom-context-menu {
+        background-color: #3b3b3b;
+        border-color: #555;
+    }
+    .dark #custom-context-menu button {
+        color: white;
+    }
+    .dark #custom-context-menu button:hover {
+        background-color: #555;
+    }
+
+    /* Retro Theme Read Later Section */
+    .window #read-later-section {
+        background-color: #c0c0c0;
+        border: 2px solid #000;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+        padding: 10px;
+        border-radius: 0 !important;
+    }
+    .window #read-later-section h2 {
+        font-family: 'VT323', monospace;
+        color: white;
+        text-align: left;
+        padding: 5px;
+        background-color: #000080;
+        margin-top: 0;
+        border-radius: 0 !important;
+    }
+    .window #read-later-list li {
+        background-color: #fff;
+        border: 2px inset #7f7f7f;
+        padding: 10px;
+        box-shadow: none;
+        border-radius: 0 !important;
+    }
+    .window #read-later-list li a {
+        font-family: 'VT323', monospace;
+        color: #0000ff;
+        text-decoration: underline;
+    }
+    .window #read-later-list p {
+        font-family: 'VT323', monospace;
+        color: #000;
+    }
+
+    /* Retro Theme Context Menu */
+    .window #custom-context-menu {
+        font-family: 'VT323', monospace;
+        background-color: #c0c0c0;
+        border: 2px solid #000;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+        border-radius: 0;
+        padding: 0;
+    }
+    .window #custom-context-menu button {
+        font-family: 'VT323', monospace;
+        color: #000;
+        padding: 5px 15px;
+    }
+    .window #custom-context-menu button:hover {
+        background-color: #000080;
+        color: white;
     }
 
     .news-item .news-source {
@@ -849,6 +1000,12 @@
         text-decoration: underline;
         font-size: 16px;
     }
+    .remove-link {
+      width: 100px;
+      height: 30px;
+      font-size: 12px;
+      background-color: #dddddd;
+    }
   </style>
 </head>
 
@@ -938,6 +1095,11 @@
         <ol id="weekly-top-queries"></ol>
       </div>
     </div>
+    <section id="read-later-section">
+      <h2>저장된 링크</h2>
+      <ul id="read-later-list"></ul>
+      <button onclick="removeLink()" class="remove-link">모두 지우기</button>
+    </section>
     <section id="news-dashboard">
       <h2><span style="color: rgb(0, 68, 255);">G</span><span style="color: rgb(255, 17, 0);">o</span><span
           style="color: rgb(255, 196, 0);">o</span><span style="color: rgb(0, 68, 255);">g</span><span
@@ -947,7 +1109,8 @@
           style="color: rgb(255, 196, 0);">o</span><span style="color: rgb(0, 68, 255);">g</span><span
           style="color: green;">l</span><span style="color: rgb(255, 17, 0);">e</span> news</p>
     </section>
-    <div class="new-features-container">
+
+    <div class="tops">
       <div id="exchange-rate-container">
         <h2>환율</h2>
         <div id="exchange-rate-display"></div>
@@ -1151,6 +1314,7 @@
       loadNewsDashboard();
       loadExchangeRates();
       setupNotepad();
+      loadReadLaterLinks();
     });
 
     let usdToKrwRate = 0;
@@ -1684,6 +1848,111 @@
     observer.observe(sentinel);
 
     logo();
+
+    // === "나중에 볼 링크" 기능 시작 ===
+    const READ_LATER_KEY = 'readLaterLinks';
+    const MAX_LINKS = 5;
+
+    function loadReadLaterLinks() {
+      const listElement = document.getElementById('read-later-list');
+      if (!listElement) return;
+
+      const links = JSON.parse(localStorage.getItem(READ_LATER_KEY) || '[]');
+      listElement.innerHTML = '';
+
+      if (links.length === 0) {
+        listElement.innerHTML = '<p style="text-align:center;">저장된 링크가 없습니다. 링크를 우클릭해 저장하세요.</p>';
+        return;
+      }
+
+      links.forEach(link => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = link.url;
+        a.textContent = link.text;
+        a.target = '_blank'; // Open in new tab
+        a.rel = 'noopener noreferrer';
+        li.appendChild(a);
+        listElement.appendChild(li);
+      });
+      
+    }
+    function removeLink() {
+      localStorage.setItem(READ_LATER_KEY, '');
+      loadReadLaterLinks();
+      
+    }
+
+    function saveToReadLater(url, text) {
+      let links = JSON.parse(localStorage.getItem(READ_LATER_KEY) || '[]');
+      
+      // Prevent duplicates
+      if (links.some(link => link.url === url)) {
+        Swal.fire({
+          title: '이미 저장된 링크입니다.',
+          icon: 'info',
+          confirmButtonText: '확인',
+          confirmButtonColor: 'orange',
+        });
+        return;
+      }
+
+      // Add new link to the beginning
+      links.unshift({ url, text });
+
+      // Keep only the latest 5
+      if (links.length > MAX_LINKS) {
+        links = links.slice(0, MAX_LINKS);
+      }
+
+      localStorage.setItem(READ_LATER_KEY, JSON.stringify(links));
+      loadReadLaterLinks();
+      Swal.fire({
+          title: '링크를 저장했습니다.',
+          icon: 'success',
+          confirmButtonText: '확인',
+          confirmButtonColor: 'green',
+          timer: 1500
+        });
+    }
+
+    document.addEventListener('contextmenu', function(e) {
+      const target = e.target.closest('a');
+      if (!target || !target.href) {
+        removeCustomContextMenu();
+        return;
+      }
+
+      e.preventDefault();
+      removeCustomContextMenu(); // Remove any existing menu
+
+      const menu = document.createElement('div');
+      menu.id = 'custom-context-menu';
+      menu.style.top = `${e.pageY}px`;
+      menu.style.left = `${e.pageX}px`;
+
+      const saveButton = document.createElement('button');
+      saveButton.innerHTML = '링크 저장하기';
+      saveButton.onclick = function() {
+        const text = target.innerHTML.replace(/<[^>]*>?/gm, '').trim();
+        saveToReadLater(target.href, text || target.href);
+        removeCustomContextMenu();
+      };
+
+      menu.appendChild(saveButton);
+      document.body.appendChild(menu);
+    });
+
+    function removeCustomContextMenu() {
+      const existingMenu = document.getElementById('custom-context-menu');
+      if (existingMenu) {
+        existingMenu.remove();
+      }
+    }
+
+    document.addEventListener('click', removeCustomContextMenu);
+    // === "나중에 볼 링크" 기능 끝 ===
+
   </script>
   <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
   <script type="text/javascript">
