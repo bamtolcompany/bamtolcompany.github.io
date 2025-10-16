@@ -46,7 +46,7 @@
   <link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-square-round.css" rel="stylesheet">
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=location_searching" />
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
   <style>
     @font-face {
       font-family: "nanum";
@@ -1076,7 +1076,7 @@
       <button onclick="search('naverKnowledgeIn')" class="category">지식in 검색</button>
     </section>
 
-    <div class="g-recaptcha" data-sitekey="6LdOjewrAAAAAOlkoEhMJzlhQ-frDSgPGsB5UWt3"></div>
+    <div id="recaptcha-container"></div>
     <div class="engine">
       <button onclick="search('google')">구글 검색</button>
       <button onclick="search('naver')">네이버 검색</button>
@@ -1191,19 +1191,19 @@
       return window.innerWidth <= 480;
     }
 
-    function saveQuery(query) {
-      if (!query) return;
+    let recaptchaWidgetId;
+    let currentSearchEngine;
 
-      const token = grecaptcha.getResponse();
-      if (!token) {
-        Swal.fire({
-          title: 'reCAPTCHA를 통과해주세요.',
-          icon: 'warning',
-          confirmButtonText: '확인',
-          confirmButtonColor: 'orange',
-        });
-        return;
-      }
+    function onRecaptchaLoad() {
+      recaptchaWidgetId = grecaptcha.render('recaptcha-container', {
+        'sitekey' : '6LfHkOwrAAAAANRee0HLhhKbB_El23Cv8Z8P2_pL', // Replace with your site key
+        'size' : 'invisible',
+        'callback' : onRecaptchaSuccess
+      });
+    }
+
+    function saveQuery(query, token) {
+      if (!query) return;
 
       fetch(SAVE_API_URL, {
         method: "POST",
@@ -1211,41 +1211,15 @@
         body: JSON.stringify({ query, token })
       })
         .then(res => res.json())
-        .then(data => {
-          console.log("Query saved:", data);
-          grecaptcha.reset(); // Reset reCAPTCHA after successful submission
-        })
+        .then(data => console.log("Query saved:", data))
         .catch(err => console.error("저장 실패:", err));
     }
-    let f8Pressed = false;
 
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "F8") {
-        f8Pressed = true;
-      }
-    });
+    function onRecaptchaSuccess(token) {
+      const query = document.getElementById('query').value.trim();
+      const engine = currentSearchEngine;
 
-    document.addEventListener("keyup", function (event) {
-      if (event.key === "F8") {
-        f8Pressed = false;
-      }
-    });
-
-    function search(engine) {
-      const input = document.getElementById('query');
-      const query = input.value.trim();
-      if (!query) {
-        Swal.fire({
-          title: '검색어를 입력해주세요',
-          icon: 'warning',
-          confirmButtonText: '확인',
-          confirmButtonColor: 'orange',
-          scrollbarPadding: false,
-          allowEnterKey: false
-        }); return;
-      }
-
-      saveQuery(query);
+      saveQuery(query, token);
 
       let url = '';
       switch (engine) {
@@ -1276,6 +1250,40 @@
       }
       localStorage.setItem("recentSearchEngine", engine);
       f8Pressed = false;
+
+      grecaptcha.reset(recaptchaWidgetId);
+    }
+
+    let f8Pressed = false;
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "F8") {
+        f8Pressed = true;
+      }
+    });
+
+    document.addEventListener("keyup", function (event) {
+      if (event.key === "F8") {
+        f8Pressed = false;
+      }
+    });
+
+    function search(engine) {
+      const input = document.getElementById('query');
+      const query = input.value.trim();
+      if (!query) {
+        Swal.fire({
+          title: '검색어를 입력해주세요',
+          icon: 'warning',
+          confirmButtonText: '확인',
+          confirmButtonColor: 'orange',
+          scrollbarPadding: false,
+          allowEnterKey: false
+        }); return;
+      }
+
+      currentSearchEngine = engine;
+      grecaptcha.execute(recaptchaWidgetId);
     }
 
     // 인기 검색어 불러오기
