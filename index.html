@@ -46,7 +46,7 @@
   <link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-square-round.css" rel="stylesheet">
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=location_searching" />
-  <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
+  <script src="https://www.google.com/recaptcha/api.js?render=6Lc5l-0rAAAAAE6lLGJAPEJx2Pb8N5OVu-Tazxu2" async defer></script>
   <style>
     @font-face {
       font-family: "nanum";
@@ -1192,16 +1192,7 @@
       return window.innerWidth <= 480;
     }
 
-    let recaptchaWidgetId;
     let currentSearchEngine;
-
-    function onRecaptchaLoad() {
-      recaptchaWidgetId = grecaptcha.render('recaptcha-container', {
-        'sitekey' : '6LfHkOwrAAAAANRee0HLhhKbB_El23Cv8Z8P2_pL', // Replace with your site key
-        'size' : 'invisible',
-        'callback' : onRecaptchaSuccess
-      });
-    }
 
     function saveQuery(query, token) {
       if (!query) return;
@@ -1215,12 +1206,6 @@
         .then(res => res.json())
         .then(data => console.log("Query saved:", data))
         .catch(err => console.error("저장 실패:", err));
-    }
-
-    function onRecaptchaSuccess(token) {
-      const query = document.getElementById('query').value.trim();
-      saveQuery(query, token);
-      grecaptcha.reset(recaptchaWidgetId);
     }
 
     let f8Pressed = false;
@@ -1283,13 +1268,19 @@
       localStorage.setItem("recentSearchEngine", engine);
       f8Pressed = false;
 
-      grecaptcha.execute(recaptchaWidgetId);
+      grecaptcha.ready(() => {
+        grecaptcha.execute('6Lc5l-0rAAAAAE6lLGJAPEJx2Pb8N5OVu-Tazxu2', {action: 'search'}).then((token) => {
+          saveQuery(query, token);
+        });
+      });
     }
 
     // 인기 검색어 불러오기
-    async function loadTopQueries() {
+    async function loadTopQueries(token) {
       try {
-        const res = await fetch(TOP_QUERIES_API_URL);
+        const res = await fetch(TOP_QUERIES_API_URL, {
+          headers: { 'X-Recaptcha-Token': token }
+        });
         const data = await res.json();
         const list = document.getElementById("top-queries");
         list.innerHTML = "";
@@ -1309,9 +1300,11 @@
       }
     }
     const WEEKLY_TOP_QUERIES_API_URL = "https://backend-bzep.onrender.com/api/weekly-top-queries";
-    async function loadWeeklyTopQueries() {
+    async function loadWeeklyTopQueries(token) {
       try {
-        const res = await fetch(WEEKLY_TOP_QUERIES_API_URL);
+        const res = await fetch(WEEKLY_TOP_QUERIES_API_URL, {
+          headers: { 'X-Recaptcha-Token': token }
+        });
         const data = await res.json();
         const list = document.getElementById("weekly-top-queries");
         list.innerHTML = "";
@@ -1333,8 +1326,12 @@
 
     // 페이지 로드 시 인기 검색어 자동 로딩
     window.addEventListener("DOMContentLoaded", () => {
-      loadTopQueries();
-      loadWeeklyTopQueries();
+      grecaptcha.ready(() => {
+        grecaptcha.execute('6Lc5l-0rAAAAAE6lLGJAPEJx2Pb8N5OVu-Tazxu2', {action: 'pageload'}).then((token) => {
+          loadTopQueries(token);
+          loadWeeklyTopQueries(token);
+        });
+      });
       loadNewsDashboard();
       loadExchangeRates();
       setupNotepad();
