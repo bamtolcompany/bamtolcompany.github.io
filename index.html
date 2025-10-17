@@ -1279,7 +1279,7 @@
     async function loadTopQueries() {
       try {
         grecaptcha.ready(async () => {
-          const token = await grecaptcha.execute('YOUR_V3_SITE_KEY', {action: 'top_queries'});
+          const token = await grecaptcha.execute('6Lc5l-0rAAAAAE6lLGJAPEJx2Pb8N5OVu-Tazxu2', {action: 'top_queries'});
           const res = await fetch(TOP_QUERIES_API_URL, {
             headers: { 'X-Recaptcha-Token': token }
           });
@@ -1313,7 +1313,7 @@
     async function loadWeeklyTopQueries() {
       try {
         grecaptcha.ready(async () => {
-          const token = await grecaptcha.execute('YOUR_V3_SITE_KEY', {action: 'weekly_queries'});
+          const token = await grecaptcha.execute('6Lc5l-0rAAAAAE6lLGJAPEJx2Pb8N5OVu-Tazxu2', {action: 'weekly_queries'});
           const res = await fetch(WEEKLY_TOP_QUERIES_API_URL, {
             headers: { 'X-Recaptcha-Token': token }
           });
