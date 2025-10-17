@@ -207,6 +207,7 @@
     .tops {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .top {
@@ -1208,7 +1209,8 @@
       fetch(SAVE_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query, token })
+        body: JSON.stringify({ query, token }),
+        keepalive: true
       })
         .then(res => res.json())
         .then(data => console.log("Query saved:", data))
@@ -1217,40 +1219,7 @@
 
     function onRecaptchaSuccess(token) {
       const query = document.getElementById('query').value.trim();
-      const engine = currentSearchEngine;
-
       saveQuery(query, token);
-
-      let url = '';
-      switch (engine) {
-        case 'google': url = `https://www.google.com/search?q=${encodeURIComponent(query)}`; break;
-        case 'naver': url = `https://search.naver.com/search.naver?query=${encodeURIComponent(query)}`; break;
-        case 'daum': url = `https://search.daum.net/search?q=${encodeURIComponent(query)}`; break;
-        case 'yahoo': url = `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`; break;
-        case 'bing': url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`; break;
-        case 'nate': url = `https://search.daum.net/nate?q=${encodeURIComponent(query)}`; break;
-        case 'zum': url = `https://search.zum.com/search.zum?query=${encodeURIComponent(query)}`; break;
-        case 'youtube': url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`; break;
-        case 'images': url = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(query)}`; break;
-        case 'ai': url = `https://www.google.com/search?udm=50&aep=11&q=${encodeURIComponent(query)}`; break;
-        case 'blog': url = `https://search.naver.com/search.naver?ssc=tab.blog.all&sm=tab_jum&query=${encodeURIComponent(query)}`; break;
-        case 'naverKnowledgeIn': url = `https://search.naver.com/search.naver?ssc=tab.kin.kqna&where=kin&sm=tab_jum&query=${encodeURIComponent(query)}`; break;
-      }
-      if (mobile()) {
-        window.location.href = url;
-      }
-      else {
-        if (f8Pressed) {
-          window.open(url, '_blank', 'width=600,height=400');
-
-        }
-        else {
-          window.open(url, '_blank');
-        }
-      }
-      localStorage.setItem("recentSearchEngine", engine);
-      f8Pressed = false;
-
       grecaptcha.reset(recaptchaWidgetId);
     }
 
@@ -1283,6 +1252,37 @@
       }
 
       currentSearchEngine = engine;
+
+      let url = '';
+      switch (engine) {
+        case 'google': url = `https://www.google.com/search?q=${encodeURIComponent(query)}`; break;
+        case 'naver': url = `https://search.naver.com/search.naver?query=${encodeURIComponent(query)}`; break;
+        case 'daum': url = `https://search.daum.net/search?q=${encodeURIComponent(query)}`; break;
+        case 'yahoo': url = `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`; break;
+        case 'bing': url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`; break;
+        case 'nate': url = `https://search.daum.net/nate?q=${encodeURIComponent(query)}`; break;
+        case 'zum': url = `https://search.zum.com/search.zum?query=${encodeURIComponent(query)}`; break;
+        case 'youtube': url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`; break;
+        case 'images': url = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(query)}`; break;
+        case 'ai': url = `https://www.google.com/search?udm=50&aep=11&q=${encodeURIComponent(query)}`; break;
+        case 'blog': url = `https://search.naver.com/search.naver?ssc=tab.blog.all&sm=tab_jum&query=${encodeURIComponent(query)}`; break;
+        case 'naverKnowledgeIn': url = `https://search.naver.com/search.naver?ssc=tab.kin.kqna&where=kin&sm=tab_jum&query=${encodeURIComponent(query)}`; break;
+      }
+      if (mobile()) {
+        window.location.href = url;
+      }
+      else {
+        if (f8Pressed) {
+          window.open(url, '_blank', 'width=600,height=400');
+
+        }
+        else {
+          window.open(url, '_blank');
+        }
+      }
+      localStorage.setItem("recentSearchEngine", engine);
+      f8Pressed = false;
+
       grecaptcha.execute(recaptchaWidgetId);
     }
 
