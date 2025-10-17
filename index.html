@@ -1276,29 +1276,32 @@
     }
 
     // 인기 검색어 불러오기
-    async function loadTopQueries(token) {
+    async function loadTopQueries() {
       try {
-        const res = await fetch(TOP_QUERIES_API_URL, {
-          headers: { 'X-Recaptcha-Token': token }
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          console.error(`[인기 검색어 TOP10] API 요청 실패:`, data);
-          const list = document.getElementById("top-queries");
-          list.innerHTML = "<li>인기 검색어를 불러오지 못했습니다.</li>";
-          return;
-        }
-        const list = document.getElementById("top-queries");
-        list.innerHTML = "";
-        data.forEach(item => {
-          const li = document.createElement("li");
-          li.classList.add("list")
-          li.textContent = item.query;
-          li.style.cursor = "pointer";
-          li.addEventListener("click", () => {
-            document.getElementById('query').value = item.query;
+        grecaptcha.ready(async () => {
+          const token = await grecaptcha.execute('YOUR_V3_SITE_KEY', {action: 'top_queries'});
+          const res = await fetch(TOP_QUERIES_API_URL, {
+            headers: { 'X-Recaptcha-Token': token }
           });
-          list.appendChild(li);
+          const data = await res.json();
+          if (!res.ok) {
+            console.error('[인기 검색어 TOP10] API 요청 실패:', data);
+            const list = document.getElementById("top-queries");
+            list.innerHTML = "<li>인기 검색어를 불러오지 못했습니다.</li>";
+            return;
+          }
+          const list = document.getElementById("top-queries");
+          list.innerHTML = "";
+          data.forEach(item => {
+            const li = document.createElement("li");
+            li.classList.add("list")
+            li.textContent = item.query;
+            li.style.cursor = "pointer";
+            li.addEventListener("click", () => {
+              document.getElementById('query').value = item.query;
+            });
+            list.appendChild(li);
+          });
         });
       } catch (err) {
         console.error("인기 검색어 불러오기 처리 중 에러:", err);
@@ -1307,29 +1310,32 @@
       }
     }
     const WEEKLY_TOP_QUERIES_API_URL = "https://backend-bzep.onrender.com/api/weekly-top-queries";
-    async function loadWeeklyTopQueries(token) {
+    async function loadWeeklyTopQueries() {
       try {
-        const res = await fetch(WEEKLY_TOP_QUERIES_API_URL, {
-          headers: { 'X-Recaptcha-Token': token }
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          console.error(`[주간 인기 검색어] API 요청 실패:`, data);
-          const list = document.getElementById("weekly-top-queries");
-          list.innerHTML = "<li>주간 인기 검색어를 불러오지 못했습니다.</li>";
-          return;
-        }
-        const list = document.getElementById("weekly-top-queries");
-        list.innerHTML = "";
-        data.forEach(item => {
-          const li = document.createElement("li");
-          li.classList.add("list")
-          li.textContent = item.query;
-          li.style.cursor = "pointer";
-          li.addEventListener("click", () => {
-            document.getElementById('query').value = item.query;
+        grecaptcha.ready(async () => {
+          const token = await grecaptcha.execute('YOUR_V3_SITE_KEY', {action: 'weekly_queries'});
+          const res = await fetch(WEEKLY_TOP_QUERIES_API_URL, {
+            headers: { 'X-Recaptcha-Token': token }
           });
-          list.appendChild(li);
+          const data = await res.json();
+          if (!res.ok) {
+            console.error('[주간 인기 검색어] API 요청 실패:', data);
+            const list = document.getElementById("weekly-top-queries");
+            list.innerHTML = "<li>주간 인기 검색어를 불러오지 못했습니다.</li>";
+            return;
+          }
+          const list = document.getElementById("weekly-top-queries");
+          list.innerHTML = "";
+          data.forEach(item => {
+            const li = document.createElement("li");
+            li.classList.add("list")
+            li.textContent = item.query;
+            li.style.cursor = "pointer";
+            li.addEventListener("click", () => {
+              document.getElementById('query').value = item.query;
+            });
+            list.appendChild(li);
+          });
         });
       } catch (err) {
         console.error("주간 인기 검색어 불러오기 처리 중 에러:", err);
@@ -1340,12 +1346,8 @@
 
     // 페이지 로드 시 인기 검색어 자동 로딩
     window.addEventListener("DOMContentLoaded", () => {
-      grecaptcha.ready(() => {
-        grecaptcha.execute('6Lc5l-0rAAAAAE6lLGJAPEJx2Pb8N5OVu-Tazxu2', {action: 'pageload'}).then((token) => {
-          loadTopQueries(token);
-          loadWeeklyTopQueries(token);
-        });
-      });
+      loadTopQueries();
+      loadWeeklyTopQueries();
       loadNewsDashboard();
       loadExchangeRates();
       setupNotepad();
