@@ -905,7 +905,8 @@
     .window #notepad-container,
     .window #notepad,
     .window .about-sites a,
-    .window fieldset {
+    .window fieldset,
+    .window .history {
       border-radius: 0 !important;
     }
 
@@ -954,7 +955,8 @@
     .window #news-dashboard,
     .window #exchange-rate-container,
     .window #notepad-container,
-    .window .m-news-container {
+    .window .m-news-container,
+    .window .history {
       background-color: #c0c0c0;
       border: 2px solid #000;
       box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
@@ -965,7 +967,8 @@
     .window #news-dashboard h2,
     .window #exchange-rate-container h2,
     .window #notepad-container h2,
-    .window .m-news-container h2 {
+    .window .m-news-container h2,
+    .window .history h2 {
       font-family: 'VT323', monospace;
       color: #000;
       text-align: left;
@@ -1027,11 +1030,21 @@
       font-size: 12px;
       background-color: #dddddd;
     }
+
     .history {
       background-color: #ffffffce;
       border-radius: 15px;
       padding: 10px;
       margin-top: 10px;
+    }
+
+    .history h2 {
+      text-align: center;
+    }
+
+    .dark .history {
+      background-color: #292929;
+      color: white;
     }
   </style>
 </head>
@@ -2037,6 +2050,10 @@
     recentQueries.forEach(query => {
       const li = document.createElement("li");
       li.textContent = query;
+      li.style.cursor = "pointer";
+      li.onclick = () => {
+        input.value = li.textContent; // 클릭하면 input에 값 넣기
+      };
       queryHistory.appendChild(li);
     });
   </script>
