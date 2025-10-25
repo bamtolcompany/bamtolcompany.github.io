@@ -1046,6 +1046,29 @@
       background-color: #292929;
       color: white;
     }
+    @keyframes bordercolor {
+      0% {
+        border-color: rgb(255, 0, 0);
+      }
+      25% {
+        border-color: #ff9900;
+      }
+      50% {
+        border-color: #ffee00;
+      }
+      75% {
+        border-color: #2bff00;
+      }
+      100% {
+        border-color: #0077ff;
+      }
+    }
+    #query:hover {
+      animation-iteration-count: infinite;
+      animation-name: bordercolor;
+      animation-duration: 3s;
+      border: 2px solid;
+    }
   </style>
 </head>
 
