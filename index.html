@@ -1046,34 +1046,16 @@
       background-color: #292929;
       color: white;
     }
-    @keyframes bordercolor {
-      0% {
-        border-color: rgb(255, 0, 0);
-      }
-      25% {
-        border-color: #ff9900;
-      }
-      50% {
-        border-color: #ffee00;
-      }
-      75% {
-        border-color: #2bff00;
-      }
-      100% {
-        border-color: #0077ff;
-      }
-    }
-    #query:hover {
-      animation-iteration-count: infinite;
-      animation-name: bordercolor;
-      animation-duration: 3s;
-      border: 2px solid;
+    .toplogo {
+      width: 100px;
+      height: auto;
     }
   </style>
 </head>
 
 <body>
   <header>
+    <img src="textlogo.png" class="toplogo">
     <h1>올인원 검색-여러 검색엔진을 한곳에서 이용하세요.</h1>
     <nav>
       <a href="https://docs.google.com/forms/d/e/1FAIpQLSfZXzol5qk6zGwrMvAco9f3M1QumJ6W2ut0g7egWFUfzHB5ig/viewform?usp=header"
@@ -1114,8 +1096,8 @@
     </div>
 
     <div style="display: flex; gap:5px; transition: 0s;" id="inputContainer">
-      <a href="https://bamtolcompany.github.io/">
-        <img src="favicon.png" style="border-radius: 25px;">
+      <a href="https://bamtolcompany.github.io/products">
+        <img src="logo.png" style="border-radius: 25px;">
       </a>
       <div style="position: relative; display: inline-block; width: 85%;">
         <input type="search" id="query" placeholder="검색어를 입력하세요" autocomplete="off">
