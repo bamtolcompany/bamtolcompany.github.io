@@ -765,6 +765,12 @@
     }
 
     @media (max-width: 768px) {
+        main {
+            padding: 8px;
+        }
+        header {
+            padding: 8px;
+        }
         .new-features-container {
             flex-direction: column;
         }
