@@ -668,11 +668,11 @@ const body = document.querySelector('body');
 const observer = new IntersectionObserver(([entry]) => {
     if (!entry.isIntersecting) {
         inputContainer.style.position = 'fixed';
-        inputContainer.style.top = '0px';
+        inputContainer.style.top = '10px';
         inputContainer.style.left = '50%';
         inputContainer.style.transform = 'translateX(-50%)';
         inputContainer.style.zIndex = '999';
-        inputContainer.style.width = '100%';
+        inputContainer.style.width = '90%';
         inputContainer.style.padding = '10px';
         inputContainer.style.paddingLeft = '30px';
 
@@ -689,7 +689,11 @@ const observer = new IntersectionObserver(([entry]) => {
             inputContainer.style.backgroundColor = '';
         }
         else {
-            inputContainer.style.backgroundColor = '#1AC8FF';
+            inputContainer.style.backgroundColor = 'rgba(52, 214, 255, 0.33)';
+            inputContainer.style.backdropFilter = 'blur(5px)'
+            inputContainer.style.border = '1px solid rgba(0, 174, 255, 0.68)';
+            inputContainer.style.borderRadius = '50px';
+            input.style.backgroundColor = 'rgba(255, 255, 255, 0.62)'
         }
     } else {
         inputContainer.style.position = '';
@@ -701,6 +705,9 @@ const observer = new IntersectionObserver(([entry]) => {
         inputContainer.style.backgroundColor = '';
         inputContainer.style.padding = '';
         inputContainer.style.paddingLeft = '';
+        inputContainer.style.backdropFilter = '';
+        inputContainer.style.border = '';
+        input.style.backgroundColor = '';
     }
 }, { threshold: 0 });
 
