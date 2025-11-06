@@ -672,12 +672,16 @@ const observer = new IntersectionObserver(([entry]) => {
         inputContainer.style.left = '50%';
         inputContainer.style.transform = 'translateX(-50%)';
         inputContainer.style.zIndex = '999';
-        inputContainer.style.width = '90%';
+        inputContainer.style.width = '85%';
         inputContainer.style.padding = '10px';
         inputContainer.style.paddingLeft = '30px';
+        inputContainer.style.borderRadius = '50px';
 
         if (body.className == 'dark') {
-            inputContainer.style.backgroundColor = 'black';
+            inputContainer.style.backgroundColor = 'rgba(1, 1, 1, 0.36)';
+            inputContainer.style.backdropFilter = 'blur(5px)';
+            inputContainer.style.border = '1px solid rgba(0, 0, 0, 0.94)';
+            input.style.backgroundColor = 'rgba(83, 83, 83, 0.31)'
         }
         else if (body.className == 'white') {
             inputContainer.style.backgroundColor = 'white';
@@ -692,7 +696,6 @@ const observer = new IntersectionObserver(([entry]) => {
             inputContainer.style.backgroundColor = 'rgba(52, 214, 255, 0.33)';
             inputContainer.style.backdropFilter = 'blur(5px)'
             inputContainer.style.border = '1px solid rgba(0, 174, 255, 0.68)';
-            inputContainer.style.borderRadius = '50px';
             input.style.backgroundColor = 'rgba(255, 255, 255, 0.62)'
         }
     } else {
