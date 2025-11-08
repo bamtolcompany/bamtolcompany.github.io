@@ -248,12 +248,22 @@ async function loadNewsDashboard() {
         for (const feed of feeds) {
             const response = await fetch(CORS_PROXY + encodeURIComponent(feed.url));
             if (!response.ok) {
-                console.error(`Failed to fetch ${feed.name}: ${response.statusText}`);
-                continue; // Skip this feed if it fails
+                const errorMessage = `뉴스 로딩 실패: ${feed.name} 피드를 가져올 수 없습니다. (HTTP 상태: ${response.status})`;
+                console.error(errorMessage);
+                newsContainer.innerHTML = `<p style="text-align:center; color:red;">${errorMessage}</p>`;
+                return; // Stop execution if fetching fails
             }
             const data = await response.text();
             const parser = new DOMParser();
             const xml = parser.parseFromString(data, 'application/xml');
+            
+            // Check for XML parsing errors
+            if (xml.getElementsByTagName("parsererror").length > 0) {
+                const errorMessage = `뉴스 로딩 실패: ${feed.name} 피드 파싱 오류. 피드 형식이 올바르지 않습니다.`;
+                console.error(errorMessage, xml.getElementsByTagName("parsererror")[0]);
+                newsContainer.innerHTML = `<p style="text-align:center; color:red;">${errorMessage}</p>`;
+                return; // Stop execution if parsing fails
+            }
             const items = xml.querySelectorAll('item');
 
             items.forEach(item => {
@@ -297,8 +307,8 @@ async function loadNewsDashboard() {
         });
 
     } catch (error) {
-        console.error('Error fetching or parsing RSS feeds:', error);
-        newsContainer.innerHTML = '<p style="text-align:center;">뉴스 로딩에 실패했습니다.</p>';
+        console.error('뉴스 로딩 중 오류 발생:', error);
+        newsContainer.innerHTML = `<p style="text-align:center; color:red;">뉴스 로딩 중 오류가 발생했습니다: ${error.message}</p>`;
     }
 }
 
