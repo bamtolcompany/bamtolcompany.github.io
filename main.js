@@ -2,6 +2,18 @@ const SAVE_API_URL = "https://backend-bzep.onrender.com/api/save-query";
 const AUTOCOMPLETE_API_URL = "https://backend-bzep.onrender.com/api/autocomplete";
 const TOP_QUERIES_API_URL = "https://backend-bzep.onrender.com/api/top-queries";
 var language = navigator.language;
+function showSearchEngine(lang) {
+    lang = language;
+    const button = document.getElementById("mysterybtn");
+    if (lang.includes("zh")) {
+        button.innerHTML = "百度";
+        button.onclick = () => search("baidu");
+    }
+    else if (lang.includes("ru")) {
+        button.innerHTML = "ЯНДЕКС";
+        button.onclick = () => search("yandex");
+    }
+}
 function mobile() {
     return window.innerWidth <= 480;
 }
@@ -66,6 +78,8 @@ function search(engine) {
         case 'ai': url = `https://www.google.com/search?udm=50&aep=11&q=${encodeURIComponent(query)}`; break;
         case 'blog': url = `https://search.naver.com/search.naver?ssc=tab.blog.all&sm=tab_jum&query=${encodeURIComponent(query)}`; break;
         case 'naverKnowledgeIn': url = `https://search.naver.com/search.naver?ssc=tab.kin.kqna&where=kin&sm=tab_jum&query=${encodeURIComponent(query)}`; break;
+        case 'baidu': url = `https://www.baidu.com/s?wd=${encodeURIComponent(query)}`; break;
+        case 'yandex': url = `https://yandex.ru/search/?text=${encodeURIComponent(query)}`; break;
     }
     if (mobile()) {
         window.location.href = url;
@@ -174,6 +188,7 @@ window.addEventListener("DOMContentLoaded", () => {
     loadExchangeRates();
     setupNotepad();
     loadReadLaterLinks();
+    showSearchEngine();
 });
 
 let usdToKrwRate = 0;
