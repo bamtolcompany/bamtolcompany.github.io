@@ -72,7 +72,7 @@ function search(engine) {
         case 'yahoo': url = `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`; break;
         case 'bing': url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`; break;
         case 'nate': url = `https://search.daum.net/nate?q=${encodeURIComponent(query)}`; break;
-        case 'zum': url = `https://search.zum.com/search.zum?query=${encodeURIComponent(query)}`; break;
+        case 'custom': url = `${localStorage.getItem("customurl")}${encodeURIComponent(query)}`; break;
         case 'youtube': url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`; break;
         case 'images': url = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(query)}`; break;
         case 'ai': url = `https://www.google.com/search?udm=50&aep=11&q=${encodeURIComponent(query)}`; break;
@@ -829,3 +829,19 @@ recentQueries.forEach(query => {
     };
     queryHistory.appendChild(li);
 });
+function editCustomEngine() {
+    document.getElementById("engineEditor").style.display = "block";
+}
+function removeCustomEngine() {
+    document.getElementById("engineEditor").style.display = "none";
+    document.getElementById("customButton").innerText = localStorage.getItem("name");
+}
+function saveCustomEngine() {
+    var name = document.getElementById("enginename");
+    var url = document.getElementById("engineurl");
+    localStorage.setItem("name", name.value);
+    localStorage.setItem("customurl", url.value);
+}
+if (localStorage.getItem("name") !== null) {
+    document.getElementById("customButton").innerText = localStorage.getItem("name");
+}

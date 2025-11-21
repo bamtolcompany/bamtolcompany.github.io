@@ -128,7 +128,7 @@
       <button onclick="search('yahoo')">야후 검색</button>
       <button onclick="search('bing')">빙 검색</button>
       <button onclick="search('nate')">네이트 검색</button>
-      <button onclick="search('zum')">줌 검색</button>
+      <button onclick="search('custom')" oncontextmenu="event.preventDefault(); editCustomEngine();" id="customButton">+(우클릭)</button>
     </div>
     <div class="tops">
       <div class="top">
@@ -227,6 +227,14 @@
     <p>&copy; 2025 bamtol company. All rights reserved. | <a href="mailto:bamtol_official@naver.com"
         class="footer-link">이메일</a></p>
   </footer>
+  <div id="engineEditor" class="engine-editor">
+    <span>검색엔진 추가 및 변경</span>
+    <input placeholder="검색엔진 이름을 입력해주세요" class="engine-editor-input" id="enginename"><br>
+    <span style="margin-top: 10px;">*예: https://google.com/search?q=</span>
+    <input placeholder="검색엔진의 url을 알려주세요" class="engine-editor-input" id="engineurl">
+    <button class="none" onclick="saveCustomEngine(); removeCustomEngine();">저장 및 닫기</button>
+    <button class="none" style="background-color: red; color: white; border: none; cursor: pointer;" onclick="removeCustomEngine()">x</button>
+  </div>
   <script src="main.js">
   </script>
   <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
