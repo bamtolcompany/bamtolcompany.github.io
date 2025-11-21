@@ -99,10 +99,6 @@
         transition: 0.3s;
         font-family: "nanum", "NanumGothic", sans-serif;
     }
-    *::selection {
-        background-color: #007bffb9;
-        color: white;
-    }
 
     h1 {
         color: rgb(20, 20, 20);
@@ -468,14 +464,14 @@
     }
 
     .news-item h3 {
-        font-size: 1.1em;
+        font-size: 1em;
         margin: 0 0 10px 0;
     }
 
     .news-item h3 a {
         text-decoration: none;
         color: #0056b3;
-        font-size: initial;
+        font-size: 1em;
     }
 
     .dark .news-item h3 a {
@@ -491,7 +487,7 @@
     }
 
     .news-item p {
-        font-size: 0.9em;
+        font-size: 0.8em;
         color: #555;
         margin: 0 0 10px 0;
     }
@@ -711,7 +707,7 @@
     }
 
     #usd-output {
-        font-size: 1.1em;
+        font-size: 1em;
         font-weight: bold;
         text-align: center;
         color: #0056b3;

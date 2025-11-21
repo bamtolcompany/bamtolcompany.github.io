@@ -247,72 +247,48 @@ function setupNotepad() {
     }
 }
 
+// HTML 태그를 제거하고 텍스트를 자르는 헬퍼 함수
+function stripHtmlAndTruncate(html, maxLength) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    let text = doc.body.textContent || "";
+    if (text.length > maxLength) {
+        text = text.substring(0, maxLength) + '...';
+    }
+    return text;
+}
+
 async function loadNewsDashboard() {
     const newsContainer = document.getElementById('news-container');
     newsContainer.innerHTML = '<p style="text-align:center;">최신 뉴스를 불러오는 중... <img src="loading.gif"/></p>';
 
-    const feeds = [
-        { name: 'Google 뉴스', url: 'https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko' }
-    ];
-
-    // NOTE: Using a public CORS proxy for prototyping purposes.
-    const CORS_PROXY = 'https://corsproxy.io/?';
+    const rssUrl = 'https://news.google.com/rss?hl=ko';
+    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
 
     try {
-        const allItems = [];
-        for (const feed of feeds) {
-            const response = await fetch(CORS_PROXY + encodeURIComponent(feed.url));
-            if (!response.ok) {
-                console.error(`Failed to fetch ${feed.name}: ${response.statusText}`);
-                continue; // Skip this feed if it fails
-            }
-            const data = await response.text();
-            const parser = new DOMParser();
-            const xml = parser.parseFromString(data, 'application/xml');
-            const items = xml.querySelectorAll('item');
-
-            items.forEach(item => {
-                const title = item.querySelector('title')?.textContent || '';
-                const link = item.querySelector('link')?.textContent || '#';
-                const description = item.querySelector('description')?.textContent.replace(/<[^>]*>?/gm, '').substring(0, 100) + '...' || '';
-                const pubDate = item.querySelector('pubDate')?.textContent || '';
-
-                allItems.push({
-                    title,
-                    link,
-                    description,
-                    pubDate: new Date(pubDate),
-                    source: feed.name
-                });
-            });
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
-
-        // Sort all items by date, newest first
-        allItems.sort((a, b) => b.pubDate - a.pubDate);
+        const data = await response.json();
+        const articles = data.items;
 
         newsContainer.innerHTML = ''; // Clear loading message
 
-        // Display a limited number of items
-        var maxItems;
-        if (mobile()) {
-            maxItems = 5;
-        }
-        else {
-            maxItems = 10;
-        }
-        allItems.slice(0, maxItems).forEach(item => {
+        let maxItems = mobile() ? 5 : 10;
+
+        articles.slice(0, maxItems).forEach(article => {
             const newsItem = document.createElement('div');
             newsItem.className = 'news-item';
             newsItem.innerHTML = `
-            <h3><a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a></h3>
-            <p>${item.description}</p>
-            <p class="news-source">${item.source} - ${item.pubDate.toLocaleString()}</p>
-          `;
+                <h3><a href="${article.link}" target="_blank" rel="noopener noreferrer">${article.title}</a></h3>
+                <p>${stripHtmlAndTruncate(article.description || '', 150)}</p>
+                <p class="news-source">${new Date(article.pubDate).toLocaleString()}</p>
+            `;
             newsContainer.appendChild(newsItem);
         });
 
     } catch (error) {
-        console.error('Error fetching or parsing RSS feeds:', error);
+        console.error('Error fetching or parsing news data:', error);
         newsContainer.innerHTML = '<p style="text-align:center;">뉴스 로딩에 실패했습니다.</p>';
     }
 }
